@@ -18,9 +18,9 @@ export default {
     })
   },
   // 更新机构
-  orgsPut(params) {
+  orgsPut(params,id) {
     return axiosApi({
-      url: `${apiConfig.deviceManagement}/api/authorizations`,
+      url: `${apiConfig.deviceManagement}/api/organizations/${id}`,
       method: 'put',
       data: params
     })
@@ -35,9 +35,8 @@ export default {
   // 机构授权列表查询
   authorizationsPage(params) {
     return axiosApi({
-      url: `${apiConfig.deviceManagement}/api/authorizations/page`,
+      url: `${apiConfig.deviceManagement}/api/authorizations/${params.organizationId}`,
       method: 'get',
-      params,
     })
   },
   // 机构授权设备

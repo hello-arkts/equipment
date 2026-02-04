@@ -70,6 +70,8 @@
             <AuthDeviceList 
                v-if="activeTab === 'devices'" 
                :rows="authDeviceList" 
+               @switch-plugin="onSwitchPlugin"
+               @delete="onDeleteAuth"
             />
             <AuthInfo 
                v-else 
@@ -214,27 +216,39 @@ const onNodeClick = async (node) => {
   
   // Fetch authorization info for the right panel list
    try {
-     const res = await orgManagementServer.authorizationsPage({ 
-         orgId: node.id, 
-         pageNum: 1, 
-         pageSize: 9999 
+     const res = await orgManagementServer.authorizationsPage({
+         organizationId: node.id,
      })
      if (res.code === 200) {
-       authDeviceList.value = res.data?.records || []
-       // Update license info
-       const authData = res.data?.records?.[0] || {}
-       licenseForm.expireTime = authData.expireTime || ''
-       licenseForm.licenseKey = authData.licenseKey || 'LICENSE-KEY-EXAMPLE-123456' // 示例授权码，实际应从API获取
+       const data = res.data || {}
+       // 处理仪器列表: 将返回的 devices 数组映射到 authDeviceList
+       authDeviceList.value = (data.devices || []).map(d => ({
+         deviceName: d.name,
+         deviceCode: d.code,
+         createTime: d.createTime,
+         // 如果接口返回的数据中没有过期时间，可能需要从 authorization 对象或其他地方获取，这里暂且留空或根据业务逻辑调整
+         expireTime: data.authorization ? data.authorization.expireTime : '' 
+       }))
+       
+       // 处理授权信息
+       const authInfo = data.authorization || {}
+       licenseForm.expireTime = authInfo.expireTime || ''
+       licenseForm.licenseKey = authInfo.licenseKey || ''
+       
+       // 更新已选设备ID列表，用于授权弹窗回显
+       selectedDeviceIds.value = (data.devices || []).map(d => d.id)
     } else {
        authDeviceList.value = []
        licenseForm.expireTime = ''
        licenseForm.licenseKey = ''
+       selectedDeviceIds.value = []
     }
   } catch (e) {
     console.error(e)
     authDeviceList.value = []
     licenseForm.expireTime = ''
     licenseForm.licenseKey = ''
+    selectedDeviceIds.value = []
   }
 }
 
@@ -356,7 +370,7 @@ const saveOrg = async () => {
     if (orgDialogMode.value === 'add') {
       res = await orgManagementServer.orgsAdd(orgForm)
     } else {
-      res = await orgManagementServer.orgsPut(orgForm)
+      res = await orgManagementServer.orgsPut(orgForm, orgForm.id)
     }
     if (res.code === 200) {
       ElMessage.success(orgDialogMode.value === 'add' ? '添加成功' : '保存成功')
@@ -419,6 +433,26 @@ const getAllDevices = async () => {
   } catch (e) {
     console.error(e)
   }
+}
+
+const onSwitchPlugin = (row) => {
+  // TODO: 实现切换插件逻辑
+  ElMessage.info(`切换插件: ${row.deviceName}`)
+}
+
+const onDeleteAuth = (row) => {
+  ElMessageBox.confirm(`确定取消授权仪器「${row.deviceName}」吗？`, '取消授权', {
+    type: 'warning',
+    confirmButtonText: '确定',
+    cancelButtonText: '取消'
+  }).then(async () => {
+    // TODO: 实现取消授权逻辑
+    // 暂时模拟删除，实际应调用后端接口
+    // const res = await orgManagementServer.authorizationsDelete(...)
+    ElMessage.success('授权已取消')
+    // 刷新列表
+    getOrgAuthorization(activeOrgId.value)
+  }).catch(() => {})
 }
 
 const saveLicense = async () => {
