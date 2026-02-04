@@ -14,7 +14,8 @@ const emit = defineEmits(['save'])
 const form = ref({
   orgName: '',
   expireTime: '',
-  licenseKey: ''
+  licenseKey: '',
+  licenseContent:''
 })
 
 watch(() => props.info, (val) => {
@@ -22,6 +23,7 @@ watch(() => props.info, (val) => {
     form.value.orgName = val.orgName || ''
     form.value.expireTime = val.expireTime || ''
     form.value.licenseKey = val.licenseKey || ''
+    form.value.licenseContent = val.licenseContent || ''
   }
 }, { immediate: true, deep: true })
 
@@ -30,9 +32,9 @@ const onSave = () => {
 }
 
 const copyLicenseKey = async () => {
-  if (!form.value.licenseKey) return
+  if (!form.value.licenseContent) return
   try {
-    await navigator.clipboard.writeText(form.value.licenseKey)
+    await navigator.clipboard.writeText(form.value.licenseContent)
     ElMessage.success('授权码已复制')
   } catch (err) {
     ElMessage.error('复制失败')
@@ -50,7 +52,7 @@ const copyLicenseKey = async () => {
             class="license-key" 
             @dblclick="copyLicenseKey"
           >
-            {{ form.licenseKey || '-' }}
+            {{ form.licenseContent || '-' }}
           </span>
         </el-tooltip>
       </el-descriptions-item>

@@ -76,7 +76,12 @@
             />
             <AuthInfo 
                v-else 
-               :info="{ orgName: activeNode, expireTime: licenseForm.expireTime, licenseKey: licenseForm.licenseKey }" 
+               :info="{
+                 orgName: activeNode,
+                 expireTime: licenseForm.expireTime,
+                 licenseKey: licenseForm.licenseKey,
+                 licenseContent:licenseForm.licenseContent
+               }"
                @save="onSaveLicense"
             />
           </div>
@@ -137,14 +142,14 @@
             <el-form-item label="过期时间">
               <el-date-picker
                 v-model="licenseForm.expireTime"
-                type="datetime"
+                type="date"
                 placeholder="选择日期时间"
                 value-format="YYYY-MM-DD HH:mm:ss"
                 style="width: 100%"
               />
             </el-form-item>
           <el-form-item label="授权码">
-            <el-input v-model="licenseForm.licenseKey" disabled placeholder="系统自动生成" />
+            <el-input v-model="licenseForm.licenseKey" placeholder="请输入授权码" />
           </el-form-item>
         </el-form>
         <template #footer>
@@ -197,7 +202,8 @@ const orgForm = reactive({
 // Auth Dialog
 const licenseForm = reactive({
   expireTime: '',
-  licenseKey: ''
+  licenseKey: '',
+  licenseContent:''
 })
 const allDevices = ref([])
 const allManufacturers = ref([])
@@ -257,6 +263,7 @@ const onNodeClick = async (node) => {
        // 处理授权信息
        const authInfo = data.authorization || {}
        licenseForm.expireTime = authInfo.expireTime || ''
+       licenseForm.licenseContent = authInfo.licenseContent || ''
        licenseForm.licenseKey = authInfo.licenseKey || ''
        
        // 更新已选设备ID列表，用于授权弹窗回显
@@ -496,9 +503,6 @@ const onDeleteAuth = (row) => {
     confirmButtonText: '确定',
     cancelButtonText: '取消'
   }).then(async () => {
-    // TODO: 实现取消授权逻辑
-    // 暂时模拟删除，实际应调用后端接口
-    // const res = await orgManagementServer.authorizationsDelete(...)
     ElMessage.success('授权已取消')
     // 刷新列表
     getOrgAuthorization(activeOrgId.value)
@@ -507,15 +511,18 @@ const onDeleteAuth = (row) => {
 
 const saveLicense = async () => {
   try {
-    const res = await orgManagementServer.usersLicense({
-      orgId: activeOrgId.value,
-      expireTime: licenseForm.expireTime
+    const res = await orgManagementServer.authorizationsLicense({
+      organizationId: activeOrgId.value,
+      expireTime: licenseForm.expireTime,
+      authCode:licenseForm.licenseKey
     })
     if (res.code === 200) {
       ElMessage.success('有效期设置成功')
     }
   } catch (e) {
     console.error(e)
+  } finally {
+    licenseDialogVisible.value = false
   }
 }
 

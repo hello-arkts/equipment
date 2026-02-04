@@ -47,6 +47,14 @@ export default {
       data: params
     })
   },
+  // 机构权限授权
+  authorizationsLicense(params) {
+    return axiosApi({
+      url: `${apiConfig.deviceManagement}/api/authorizations/license`,
+      method: 'post',
+      data: params
+    })
+  },
   authorizationsSetDefault(params) {
     return axiosApi({
       url: `${apiConfig.deviceManagement}/api/authorizations/setDefaultPlugin`,
