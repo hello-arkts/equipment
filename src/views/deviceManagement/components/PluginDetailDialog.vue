@@ -3,6 +3,7 @@
     v-model="visible"
     title="插件详情"
     width="800px"
+    draggable
     @close="onClose"
     class="plugin-dialog"
   >
@@ -28,6 +29,7 @@
       v-model="editDialogVisible"
       :title="editMode === 'add' ? '添加插件' : '编辑插件'"
       width="500px"
+      draggable
       append-to-body
     >
       <el-form :model="form" label-width="80px">
@@ -241,7 +243,7 @@ const onSave = async () => {
   padding: 20px;
 }
 .plugin-content {
-  max-height: 70vh;
+  height: 50vh;
   display: flex;
   flex-direction: column;
 }

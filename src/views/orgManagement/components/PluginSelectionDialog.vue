@@ -3,6 +3,7 @@
     v-model="visible"
     title="切换插件"
     width="800px"
+    draggable
     @close="onClose"
     class="plugin-selection-dialog"
   >
@@ -15,9 +16,14 @@
         class="mb-4"
       />
       <el-table :data="plugins" border stripe style="width: 100%; height: 100%; flex: 1" class="flex-1" v-loading="loading">
-        <el-table-column prop="name" label="插件名称" min-width="150" />
+        <el-table-column prop="jarName" label="插件名称" min-width="150" />
         <el-table-column prop="version" label="版本号" width="120" />
         <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
+        <el-table-column label="状态" width="100" align="center">
+          <template #default="{ row }">
+            <el-tag v-if="row.id === defaultPluginId" type="success" size="small">默认</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="120" align="center" fixed="right">
           <template #default="{ row }">
             <el-button 
@@ -51,6 +57,10 @@ const props = defineProps({
     default: () => ({})
   },
   currentPluginId: {
+    type: [String, Number],
+    default: ''
+  },
+  defaultPluginId: {
     type: [String, Number],
     default: ''
   }
@@ -120,7 +130,6 @@ const onSelect = (plugin) => {
 }
 :deep(.plugin-selection-dialog .el-dialog__body) {
   flex: 1;
-  min-height: 0;
   overflow: hidden;
   padding: 20px;
   display: flex;
@@ -131,7 +140,7 @@ const onSelect = (plugin) => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-height: 0;
+  height: 50vh;
 }
 .mb-4 {
   margin-bottom: 16px;

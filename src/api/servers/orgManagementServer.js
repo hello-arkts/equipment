@@ -46,5 +46,12 @@ export default {
       method: 'post',
       data: params
     })
+  },
+  authorizationsSetDefault(params) {
+    return axiosApi({
+      url: `${apiConfig.deviceManagement}/api/authorizations/setDefaultPlugin`,
+      method: 'post',
+      data: params
+    })
   }
 }

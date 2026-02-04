@@ -11,6 +11,7 @@
             :data="treeData"
             :props="defaultProps"
             highlight-current
+            node-key="id"
             :expand-on-click-node="false"
             default-expand-all
             :filter-node-method="filterNode"
@@ -60,14 +61,14 @@
                <span v-if="activeNode" class="text-gray-500 text-sm">({{ activeNode }})</span>
             </div>
             <div v-if="activeTab === 'devices'">
-              <el-button type="primary" @click="openAssignDeviceDialog">仪器授权</el-button>
+              <el-button type="primary" @click="openAssignDeviceDialog">仪器绑定</el-button>
             </div>
             <div v-else>
               <el-button type="primary" @click="openLicenseDialog">机构授权</el-button>
             </div>
           </div>
           <div class="content-wrapper">
-            <AuthDeviceList 
+            <AuthDeviceList
                v-if="activeTab === 'devices'" 
                :rows="authDeviceList" 
                @switch-plugin="onSwitchPlugin"
@@ -88,6 +89,7 @@
       v-model="orgDialogVisible"
       :title="orgDialogTitle"
       width="500px"
+      draggable
       @close="closeOrgDialog"
     >
       <el-form :model="orgForm" label-width="80px">
@@ -105,33 +107,32 @@
     <!-- 仪器授权弹窗 -->
     <el-dialog
       v-model="assignDeviceDialogVisible"
-      title="仪器授权"
-      width="600px"
+      title="仪器绑定"
+      width="800px"
+      draggable
       @close="closeAssignDeviceDialog"
     >
        <div style="height: 400px; display: flex; flex-direction: column;">
           <div style="margin-bottom: 10px; font-weight: bold;">
              当前机构：{{ activeNode }}
           </div>
-          <el-transfer
+          <DeviceAuthTransfer
              v-model="selectedDeviceIds"
-             :data="allDevices"
-             :titles="['未授权仪器', '已授权仪器']"
-             filterable
-             filter-placeholder="搜索仪器"
+             :all-devices="allDevices"
+             :manufacturers="allManufacturers"
              style="flex: 1"
           />
        </div>
        <template #footer>
         <div class="dialog-footer">
           <el-button @click="closeAssignDeviceDialog">取消</el-button>
-          <el-button type="primary" @click="saveDeviceAuth">保存授权</el-button>
+          <el-button type="primary" @click="saveDeviceAuth">保存绑定</el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 有效期设置弹窗 -->
-    <el-dialog v-model="licenseDialogVisible" title="机构授权" width="400px">
+    <el-dialog v-model="licenseDialogVisible" title="机构授权" width="400px" draggable>
         <el-form :model="licenseForm" label-width="80px">
             <el-form-item label="过期时间">
               <el-date-picker
@@ -159,6 +160,7 @@
       v-model="pluginSelectionDialogVisible"
       :device="currentSwitchDevice"
       :current-plugin-id="currentSwitchDevice?.pluginId"
+      :default-plugin-id="currentSwitchDevice?.defaultPluginId"
       @confirm="handlePluginSwitch"
     />
   </div>
@@ -173,6 +175,7 @@ import deviceManagementServer from '../../api/servers/deviceManagementServer.js'
 import AuthDeviceList from './components/AuthDeviceList.vue'
 import AuthInfo from './components/AuthInfo.vue'
 import PluginSelectionDialog from './components/PluginSelectionDialog.vue'
+import DeviceAuthTransfer from './components/DeviceAuthTransfer.vue'
 
 const orgSearch = ref('')
 const activeNode = ref('')
@@ -197,6 +200,7 @@ const licenseForm = reactive({
   licenseKey: ''
 })
 const allDevices = ref([])
+const allManufacturers = ref([])
 const selectedDeviceIds = ref([])
 
 const authDeviceList = ref([])
@@ -236,12 +240,19 @@ const onNodeClick = async (node) => {
        authDeviceList.value = (data.devices || []).map(d => ({
          id: d.id,
          pluginId: d.pluginId,
+         defaultPluginId: d.plugin.id, // Store default plugin ID from API
          deviceName: d.name,
          deviceCode: d.code,
          createTime: d.createTime,
+         ordName:d.manufacturer.name,
+         deviceModel:d.model,
+         jarName:d.plugin.jarName,
+         pluginVersion:d.plugin.version,
          // 如果接口返回的数据中没有过期时间，可能需要从 authorization 对象或其他地方获取，这里暂且留空或根据业务逻辑调整
          expireTime: data.authorization ? data.authorization.expireTime : '' 
        }))
+
+       console.log(authDeviceList.value,'xixi')
        
        // 处理授权信息
        const authInfo = data.authorization || {}
@@ -279,14 +290,15 @@ const getOrgsPage = async (name = '', autoSelect = false) => {
   if(res.code == 200){
     leftTableData.value = res.data.records
     if (autoSelect) {
-      const first = leftTableData.value[0]
-      if (first) {
-        activeOrgId.value = first.id
-        activeNode.value = first.name || ''
-        Object.assign(orgForm, {
-            id: first.id,
-            name: first.name || '',
-        })
+      const firstOrg = leftTableData.value[0]
+      if (firstOrg) {
+        // We need to wait for tree to render to set current key
+        setTimeout(() => {
+          if (treeRef.value) {
+            treeRef.value.setCurrentKey(firstOrg.id)
+            onNodeClick({ id: firstOrg.id, label: firstOrg.name })
+          }
+        }, 0)
       }
     }
   }
@@ -400,8 +412,8 @@ const openAssignDeviceDialog = async () => {
      ElMessage.warning('请先选择一个机构')
      return
   }
-  // Load devices and current selection
   await getOrgAuthorization(activeOrgId.value)
+  await getAllManufacturers()
   await getAllDevices()
   assignDeviceDialogVisible.value = true
 }
@@ -421,10 +433,6 @@ const getOrgAuthorization = async (orgId) => {
     if (res.code === 200) {
        const authData = res.data?.records?.[0] || {}
        licenseForm.expireTime = authData.expireTime || ''
-       // Assuming authData contains list of authorized device IDs or we need another API
-       // Here we assume the API returns authorized device list for the org
-       // Adjust based on actual API response structure if needed
-       // For now, let's assume authorizationsPage returns list of authorized devices
        selectedDeviceIds.value = res.data?.records?.map(item => item.deviceId) || []
        licenseForm.licenseKey = authData.licenseKey || 'LICENSE-KEY-EXAMPLE-123456'
     }
@@ -437,11 +445,18 @@ const getAllDevices = async () => {
   try {
     const res = await deviceManagementServer.devicesPage({ pageNum: 1, pageSize: 9999 })
     if (res.code === 200) {
-      allDevices.value = (res.data?.records || []).map(d => ({
-        key: d.id,
-        label: `${d.name} (${d.code || '-'})`,
-        disabled: false
-      }))
+      allDevices.value = res.data?.records || []
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const getAllManufacturers = async () => {
+  try {
+    const res = await deviceManagementServer.manufacturersPage({ pageNum: 1, pageSize: 9999 })
+    if (res.code === 200) {
+      allManufacturers.value = res.data?.records || []
     }
   } catch (e) {
     console.error(e)
@@ -456,18 +471,11 @@ const onSwitchPlugin = (row) => {
 const handlePluginSwitch = async (plugin) => {
   if (!currentSwitchDevice.value || !activeOrgId.value) return
 
-  // 构建新的授权设备列表
-  // 假设 authDeviceList 包含了当前所有授权设备
-  // 如果是分页的，这里可能有问题，但目前 authorizationsPage 用的是 pageSize: 9999
-  const devicePlugins = authDeviceList.value.map(item => ({
-    deviceId: item.id,
-    pluginId: item.id === currentSwitchDevice.value.id ? plugin.id : (item.pluginId || 2) // 默认值2需要确认
-  }))
-
   try {
-    const res = await orgManagementServer.authorizationsDevices({
-      organizationId: activeOrgId.value,
-      devicePlugins
+    const res = await orgManagementServer.authorizationsSetDefault({
+      organizationId: Number(activeOrgId.value),
+      deviceId: Number(currentSwitchDevice.value.id),
+      pluginId: Number(plugin.id)
     })
     
     if (res.code === 200) {
@@ -513,13 +521,9 @@ const saveLicense = async () => {
 
 const saveDeviceAuth = async () => {
   try {
-    const devicePlugins = selectedDeviceIds.value.map(deviceId => ({
-      deviceId,
-      pluginId: 2 // 默认 pluginId 为 2，如有其他逻辑需调整
-    }))
     const res = await orgManagementServer.authorizationsDevices({
       organizationId: activeOrgId.value,
-      devicePlugins
+      deviceIds: selectedDeviceIds.value
     })
     if (res.code === 200) {
       ElMessage.success('仪器授权保存成功')

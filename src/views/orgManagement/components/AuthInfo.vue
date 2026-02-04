@@ -44,7 +44,7 @@ const copyLicenseKey = async () => {
   <div class="auth-info-container">
     <el-descriptions title="机构授权详情" :column="1" border>
       <el-descriptions-item label="机构名称">{{ form.orgName || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="授权码">
+      <el-descriptions-item label="激活码">
         <el-tooltip content="双击复制" placement="top">
           <span 
             class="license-key" 

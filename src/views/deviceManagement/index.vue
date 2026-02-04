@@ -60,6 +60,7 @@
       v-model="manufacturerDialogVisible"
       :title="manufacturerDialogTitle"
       width="500px"
+      draggable
       @close="closeManufacturerDialog"
     >
       <el-form :model="manufacturerForm" label-width="80px">
@@ -78,6 +79,7 @@
       v-model="deviceDialogVisible"
       :title="deviceDialogTitle"
       width="500px"
+      draggable
       @close="closeDeviceDialog"
     >
       <el-form :model="deviceForm" label-width="80px">
@@ -266,7 +268,7 @@ const closeDeviceDialog = () => {
   deviceDialogVisible.value = false
 }
 
-const saveDevice = async () => {
+  const saveDevice = async () => {
   try {
     const params = {
       id: deviceForm.id,
