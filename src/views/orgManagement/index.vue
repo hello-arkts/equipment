@@ -153,6 +153,14 @@
           </div>
         </template>
     </el-dialog>
+
+    <!-- 插件选择弹窗 -->
+    <PluginSelectionDialog
+      v-model="pluginSelectionDialogVisible"
+      :device="currentSwitchDevice"
+      :current-plugin-id="currentSwitchDevice?.pluginId"
+      @confirm="handlePluginSwitch"
+    />
   </div>
 </template>
 
@@ -164,6 +172,7 @@ import orgManagementServer from '../../api/servers/orgManagementServer.js'
 import deviceManagementServer from '../../api/servers/deviceManagementServer.js'
 import AuthDeviceList from './components/AuthDeviceList.vue'
 import AuthInfo from './components/AuthInfo.vue'
+import PluginSelectionDialog from './components/PluginSelectionDialog.vue'
 
 const orgSearch = ref('')
 const activeNode = ref('')
@@ -193,6 +202,8 @@ const selectedDeviceIds = ref([])
 const authDeviceList = ref([])
 
 const assignDeviceDialogVisible = ref(false)
+const pluginSelectionDialogVisible = ref(false)
+const currentSwitchDevice = ref(null)
 const licenseDialogVisible = ref(false)
 
 const treeData = computed(() => [
@@ -223,6 +234,8 @@ const onNodeClick = async (node) => {
        const data = res.data || {}
        // 处理仪器列表: 将返回的 devices 数组映射到 authDeviceList
        authDeviceList.value = (data.devices || []).map(d => ({
+         id: d.id,
+         pluginId: d.pluginId,
          deviceName: d.name,
          deviceCode: d.code,
          createTime: d.createTime,
@@ -436,8 +449,37 @@ const getAllDevices = async () => {
 }
 
 const onSwitchPlugin = (row) => {
-  // TODO: 实现切换插件逻辑
-  ElMessage.info(`切换插件: ${row.deviceName}`)
+  currentSwitchDevice.value = row
+  pluginSelectionDialogVisible.value = true
+}
+
+const handlePluginSwitch = async (plugin) => {
+  if (!currentSwitchDevice.value || !activeOrgId.value) return
+
+  // 构建新的授权设备列表
+  // 假设 authDeviceList 包含了当前所有授权设备
+  // 如果是分页的，这里可能有问题，但目前 authorizationsPage 用的是 pageSize: 9999
+  const devicePlugins = authDeviceList.value.map(item => ({
+    deviceId: item.id,
+    pluginId: item.id === currentSwitchDevice.value.id ? plugin.id : (item.pluginId || 2) // 默认值2需要确认
+  }))
+
+  try {
+    const res = await orgManagementServer.authorizationsDevices({
+      organizationId: activeOrgId.value,
+      devicePlugins
+    })
+    
+    if (res.code === 200) {
+      ElMessage.success(`已切换到插件: ${plugin.name}`)
+      pluginSelectionDialogVisible.value = false
+      // 刷新列表
+      getOrgAuthorization(activeOrgId.value)
+    }
+  } catch (e) {
+    console.error(e)
+    ElMessage.error('切换插件失败')
+  }
 }
 
 const onDeleteAuth = (row) => {
