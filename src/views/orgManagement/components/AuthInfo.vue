@@ -44,8 +44,12 @@ const copyLicenseKey = async () => {
 
 <template>
   <div class="auth-info-container">
-    <el-descriptions title="机构授权详情" :column="1" border>
+    <el-descriptions title="机构授权详情" :column="1" border label-width="200px">
       <el-descriptions-item label="机构名称">{{ form.orgName || '-' }}</el-descriptions-item>
+      <el-descriptions-item label="当前有效期">
+        <el-tag v-if="form.expireTime" type="success">{{ form.expireTime ? form.expireTime.split(' ')[0] : '' }}</el-tag>
+        <span v-else class="text-gray-400">暂未设置</span>
+      </el-descriptions-item>
       <el-descriptions-item label="激活码">
         <el-tooltip content="双击复制" placement="top">
           <span 
@@ -55,10 +59,6 @@ const copyLicenseKey = async () => {
             {{ form.licenseContent || '-' }}
           </span>
         </el-tooltip>
-      </el-descriptions-item>
-      <el-descriptions-item label="当前有效期">
-        <el-tag v-if="form.expireTime" type="success">{{ form.expireTime }}</el-tag>
-        <span v-else class="text-gray-400">暂未设置</span>
       </el-descriptions-item>
     </el-descriptions>
   </div>
@@ -79,6 +79,10 @@ const copyLicenseKey = async () => {
   border-radius: 4px;
   color: #606266;
   user-select: none;
+  display: inline-block;
+  word-break: break-all;
+  white-space: pre-wrap;
+  max-width: 100%;
   
   &:hover {
     background: #e9e9eb;

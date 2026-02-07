@@ -34,9 +34,15 @@ export default {
   },
   // 机构授权列表查询
   authorizationsPage(params) {
+    // Determine if we should use organizationId or orgId (unify usage)
+    const id = params.organizationId || params.orgId
     return axiosApi({
-      url: `${apiConfig.deviceManagement}/api/authorizations/${params.organizationId}`,
+      url: `${apiConfig.deviceManagement}/api/authorizations/${id}`,
       method: 'get',
+      // If we need to pass query params like timestamp
+      params: {
+        _t: params._t
+      }
     })
   },
   // 机构授权设备

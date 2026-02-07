@@ -239,6 +239,7 @@ const onNodeClick = async (node) => {
    try {
      const res = await orgManagementServer.authorizationsPage({
          organizationId: node.id,
+         _t: Date.now() // Prevent caching
      })
      if (res.code === 200) {
        const data = res.data || {}
@@ -246,14 +247,14 @@ const onNodeClick = async (node) => {
        authDeviceList.value = (data.devices || []).map(d => ({
          id: d.id,
          pluginId: d.pluginId,
-         defaultPluginId: d.plugin.id, // Store default plugin ID from API
+         defaultPluginId: d.plugin?.id, // Store default plugin ID from API
          deviceName: d.name,
          deviceCode: d.code,
          createTime: d.createTime,
-         ordName:d.manufacturer.name,
-         deviceModel:d.model,
-         jarName:d.plugin.jarName,
-         pluginVersion:d.plugin.version,
+         ordName: d.manufacturer?.name,
+         deviceModel: d.model,
+         jarName: d.plugin?.jarName,
+         pluginVersion: d.plugin?.version,
          // 如果接口返回的数据中没有过期时间，可能需要从 authorization 对象或其他地方获取，这里暂且留空或根据业务逻辑调整
          expireTime: data.authorization ? data.authorization.expireTime : '' 
        }))
@@ -436,12 +437,37 @@ const closeAuthDialog = () => {
 
 const getOrgAuthorization = async (orgId) => {
   try {
-    const res = await orgManagementServer.authorizationsPage({ orgId, pageNum: 1, pageSize: 9999 })
+    const res = await orgManagementServer.authorizationsPage({ 
+      orgId, 
+      pageNum: 1, 
+      pageSize: 9999,
+      _t: Date.now() 
+    })
     if (res.code === 200) {
        const authData = res.data?.records?.[0] || {}
        licenseForm.expireTime = authData.expireTime || ''
        selectedDeviceIds.value = res.data?.records?.map(item => item.deviceId) || []
-       licenseForm.licenseKey = authData.licenseKey || 'LICENSE-KEY-EXAMPLE-123456'
+       licenseForm.licenseKey = authData.licenseKey 
+       const data = res.data || {}
+       authDeviceList.value = (data.devices || []).map(d => ({
+         id: d.id,
+         pluginId: d.pluginId,
+         defaultPluginId: d.plugin?.id,
+         deviceName: d.name,
+         deviceCode: d.code,
+         createTime: d.createTime,
+         ordName: d.manufacturer?.name,
+         deviceModel: d.model,
+         jarName: d.plugin?.jarName,
+         pluginVersion: d.plugin?.version,
+         expireTime: data.authorization ? data.authorization.expireTime : '' 
+       }))
+       
+       // Also update license info
+       const authInfo = data.authorization || {}
+       licenseForm.expireTime = authInfo.expireTime || ''
+       licenseForm.licenseKey = authInfo.licenseKey || ''
+       selectedDeviceIds.value = (data.devices || []).map(d => d.id)
     }
   } catch (e) {
     console.error(e)
@@ -486,7 +512,7 @@ const handlePluginSwitch = async (plugin) => {
     })
     
     if (res.code === 200) {
-      ElMessage.success(`已切换到插件: ${plugin.name}`)
+      ElMessage.success(`已切换到插件: ${plugin.jarName}`)
       pluginSelectionDialogVisible.value = false
       // 刷新列表
       getOrgAuthorization(activeOrgId.value)
