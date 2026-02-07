@@ -64,6 +64,7 @@ const handleLogin = async () => {
           const token = res.data?.token || res.data
           if (token) {
             localStorage.setItem('token', token)
+            localStorage.setItem('username', loginForm.username)
           }
           router.push('/')
         } else {

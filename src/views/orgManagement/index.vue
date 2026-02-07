@@ -262,8 +262,6 @@ const onNodeClick = async (node) => {
          // 如果接口返回的数据中没有过期时间，可能需要从 authorization 对象或其他地方获取，这里暂且留空或根据业务逻辑调整
          expireTime: data.authorization ? data.authorization.expireTime : '' 
        }))
-
-       console.log(authDeviceList.value,'xixi')
        
        // 处理授权信息
        const authInfo = data.authorization || {}

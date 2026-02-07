@@ -95,15 +95,13 @@ const props = defineProps({
   },
   allDevices: {
     type: Array,
-    default: () => [] // Expected: { id, name, code, manufacturerId, manufacturerName }
+    default: () => []
   },
   manufacturers: {
     type: Array,
-    default: () => [] // Expected: { id, name }
+    default: () => []
   }
 })
-
-console.log(props,'xixi')
 
 const emit = defineEmits(['update:modelValue'])
 
@@ -112,18 +110,10 @@ const treeRef = ref(null)
 const leftCheckedKeys = ref([]) // Keys checked in tree
 const rightCheckedRows = ref([]) // Rows checked in table
 
-// 1. Build Tree Data for Left Panel (Unassigned)
 const treeData = computed(() => {
-  // Get IDs currently selected (in right panel)
   const selectedIds = new Set(props.modelValue)
 
-  // Group unassigned devices by manufacturer
   const groups = {}
-  
-  // Initialize groups with all manufacturers to ensure they appear even if empty?
-  // User req: "Unauthorized devices to be displayed as a tree under manufacturers"
-  // If a manufacturer has no unauthorized devices, maybe we skip it?
-  // Let's iterate manufacturers first to keep order/structure
   props.manufacturers.forEach(m => {
     groups[m.id] = {
       key: `m_${m.id}`,

@@ -9,9 +9,11 @@
       </div>
       <div class="header-right">
         <el-dropdown @command="handleCommand">
-          <span class="el-dropdown-link">
-            管理员<el-icon class="el-icon--right"><arrow-down /></el-icon>
-          </span>
+          <div class="el-dropdown-link">
+            <el-avatar :size="30" :icon="UserFilled" class="user-avatar" />
+            <span class="username">{{ username }}</span>
+            <el-icon class="el-icon--right"><arrow-down /></el-icon>
+          </div>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item command="logout">退出登录</el-dropdown-item>
@@ -89,7 +91,8 @@ import {
   Collection,
   Download,
   Tickets,
-  ArrowDown
+  ArrowDown,
+  UserFilled
 } from '@element-plus/icons-vue'
 import loginServers from '../api/servers/loginServers'
 import { ElMessage } from 'element-plus'
@@ -98,6 +101,7 @@ const route = useRoute()
 const router = useRouter()
 const activeMenu = computed(() => route.path)
 const isCollapse = ref(false)
+const username = ref(localStorage.getItem('username') || '管理员')
 
 const toggleCollapse = () => {
   isCollapse.value = !isCollapse.value
@@ -111,6 +115,7 @@ const handleCommand = async (command) => {
       console.error(error)
     } finally {
       localStorage.removeItem('token')
+      localStorage.removeItem('username')
       ElMessage.success('退出成功')
       router.push('/login')
     }
@@ -164,6 +169,28 @@ $header-height: 50px;
       color: white;
       display: flex;
       align-items: center;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      &:focus-visible {
+        outline: none;
+      }
+
+      .user-avatar {
+        margin-right: 8px;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+
+      .username {
+        margin-right: 4px;
+        font-weight: 500;
+      }
     }
   }
 }
