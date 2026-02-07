@@ -8,6 +8,13 @@ const service = axios.create({
 service.interceptors.request.use(
   (config) => {
     config.headers = config.headers || {}
+    
+    // 从 localStorage 获取 token 并添加到 headers
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}` // 根据后端要求调整，通常是 Bearer token
+    }
+
     if (!config.headers['Accept']) config.headers['Accept'] = 'application/json'
     if (!config.headers['Content-Type']) config.headers['Content-Type'] = 'application/json'
     if (config.formData) {
@@ -45,5 +52,5 @@ service.interceptors.response.use(
 export const axiosApi = (config = {}) => service({ ...config })
 
 export const apiConfig = {
-    deviceManagement:'/deviceManagement'
+    deviceManagement:'/yiqi'
 }

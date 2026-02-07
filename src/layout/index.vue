@@ -7,6 +7,18 @@
           <span class="logo-text">设备插件管理系统</span>
         </div>
       </div>
+      <div class="header-right">
+        <el-dropdown @command="handleCommand">
+          <span class="el-dropdown-link">
+            管理员<el-icon class="el-icon--right"><arrow-down /></el-icon>
+          </span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
     </el-header>
 
     <el-container class="main-container">
@@ -62,7 +74,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { 
   ElementPlus, 
   Fold,
@@ -76,15 +88,33 @@ import {
   Setting,
   Collection,
   Download,
-  Tickets
+  Tickets,
+  ArrowDown
 } from '@element-plus/icons-vue'
+import loginServers from '../api/servers/loginServers'
+import { ElMessage } from 'element-plus'
 
 const route = useRoute()
+const router = useRouter()
 const activeMenu = computed(() => route.path)
 const isCollapse = ref(false)
 
 const toggleCollapse = () => {
   isCollapse.value = !isCollapse.value
+}
+
+const handleCommand = async (command) => {
+  if (command === 'logout') {
+    try {
+      await loginServers.logout()
+    } catch (error) {
+      console.error(error)
+    } finally {
+      localStorage.removeItem('token')
+      ElMessage.success('退出成功')
+      router.push('/login')
+    }
+  }
 }
 </script>
 
@@ -123,6 +153,17 @@ $header-height: 50px;
         font-size: 24px;
         margin-right: 8px;
       }
+    }
+  }
+
+  .header-right {
+    padding-right: 20px;
+    
+    .el-dropdown-link {
+      cursor: pointer;
+      color: white;
+      display: flex;
+      align-items: center;
     }
   }
 }

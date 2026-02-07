@@ -8,7 +8,7 @@
         stripe 
         style="width: 100%; height: 100%"
       >
-        <el-table-column type="index" label="序号" width="60" />
+        <el-table-column type="index" label="序号" width="60" align="center" />
         <el-table-column prop="organizationName" label="机构名称" />
         <el-table-column prop="downloadTime" label="下载时间" />
       </el-table>

@@ -4,7 +4,7 @@ export default {
     //下载记录
     downloadsRecords(params) {
         return axiosApi({
-            url: `${apiConfig.deviceManagement}/api/downloads/records`,
+            url: `${apiConfig.deviceManagement}/downloads/records`,
             method: 'get',
             params,
         })
@@ -12,7 +12,7 @@ export default {
     //获取授权记录
     pageRecords(params) {
         return axiosApi({
-            url: `${apiConfig.deviceManagement}/api/authorization-records/page`,
+            url: `${apiConfig.deviceManagement}/authorization-records/page`,
             method: 'get',
             params,
         })
