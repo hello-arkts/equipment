@@ -7,9 +7,6 @@
           <span class="logo-text">设备插件管理系统</span>
         </div>
       </div>
-      <div class="top-nav">
-        <div class="nav-item active">设备插件管理</div>
-      </div>
     </el-header>
 
     <el-container class="main-container">
@@ -36,10 +33,20 @@
             <el-icon><Files /></el-icon>
             <span>机构管理</span>
           </el-menu-item>
-          <el-menu-item index="/category">
-            <el-icon><Collection /></el-icon>
-            <span>下载记录</span>
-          </el-menu-item>
+          <el-sub-menu index="/history">
+            <template #title>
+              <el-icon><Collection /></el-icon>
+              <span>历史记录</span>
+            </template>
+            <el-menu-item index="/category">
+              <el-icon><Download /></el-icon>
+              <span>下载记录</span>
+            </el-menu-item>
+            <el-menu-item index="/authRecord">
+              <el-icon><Tickets /></el-icon>
+              <span>授权记录</span>
+            </el-menu-item>
+          </el-sub-menu>
         </el-menu>
       </el-aside>
       
@@ -67,7 +74,9 @@ import {
   Connection,
   Operation,
   Setting,
-  Collection
+  Collection,
+  Download,
+  Tickets
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -113,33 +122,6 @@ $header-height: 50px;
       .logo-icon {
         font-size: 24px;
         margin-right: 8px;
-      }
-    }
-  }
-
-  .top-nav {
-    display: flex;
-    justify-content: center;
-    flex: 1;
-    
-    .nav-item {
-      padding: 0 20px;
-      height: $header-height;
-      line-height: $header-height;
-      cursor: pointer;
-      font-size: 14px;
-      opacity: 0.8;
-      
-      &:hover {
-        opacity: 1;
-        background-color: rgba(255, 255, 255, 0.1);
-      }
-      
-      &.active {
-        opacity: 1;
-        background-color: white;
-        color: $theme-blue;
-        font-weight: bold;
       }
     }
   }

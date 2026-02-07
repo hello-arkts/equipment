@@ -22,8 +22,14 @@ const routes = [
       {
         path: 'category',
         name: 'Category',
-        component: () => import('../views/Placeholder.vue'),
-        meta: { title: '分类管理' }
+        component: () => import('../views/recordManagement/downloadHistory/index.vue'),
+        meta: { title: '下载记录' }
+      },
+      {
+        path: 'authRecord',
+        name: 'AuthRecord',
+        component: () => import('../views/recordManagement/authorizationRecord/index.vue'),
+        meta: { title: '授权记录' }
       }
     ]
   }

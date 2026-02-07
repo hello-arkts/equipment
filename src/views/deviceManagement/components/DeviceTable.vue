@@ -4,6 +4,7 @@
     <el-table-column prop="name" label="设备名称" />
     <el-table-column prop="code" label="设备编码" />
     <el-table-column prop="manufacturer" label="生产厂家" />
+    <el-table-column prop="pluginCount" label="插件数量" />
 
     <el-table-column label="操作" width="200" align="center" fixed="right">
       <template #default="{ row }">

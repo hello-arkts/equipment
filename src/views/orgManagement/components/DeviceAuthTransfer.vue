@@ -46,6 +46,7 @@
         type="primary"
         :disabled="leftCheckedKeys.length === 0"
         @click="addToTarget"
+        class="action-btn"
       >
         <el-icon><ArrowRight /></el-icon>
       </el-button>
@@ -53,6 +54,7 @@
         type="primary"
         :disabled="rightCheckedRows.length === 0"
         @click="removeFromTarget"
+        class="action-btn"
       >
         <el-icon><ArrowLeft /></el-icon>
       </el-button>
@@ -300,6 +302,22 @@ const removeFromTarget = () => {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  justify-content: center;
+}
+
+.action-btn {
+  margin-left: 0 !important;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.right-panel .panel-body {
+  padding: 0;
 }
 
 .device-tag {

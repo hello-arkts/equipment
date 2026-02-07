@@ -61,6 +61,7 @@
                <span v-if="activeNode" class="text-gray-500 text-sm">({{ activeNode }})</span>
             </div>
             <div v-if="activeTab === 'devices'">
+              <el-button type="primary" @click="handlePluginDownload">插件下载</el-button>
               <el-button type="primary" @click="openAssignDeviceDialog">仪器绑定</el-button>
             </div>
             <div v-else>
@@ -73,6 +74,7 @@
                :rows="authDeviceList" 
                @switch-plugin="onSwitchPlugin"
                @delete="onDeleteAuth"
+               @selection-change="onSelectionChange"
             />
             <AuthInfo 
                v-else 
@@ -129,7 +131,7 @@
           />
        </div>
        <template #footer>
-        <div class="dialog-footer">
+        <div class="dialog-footer" style="margin-top: 30px">
           <el-button @click="closeAssignDeviceDialog">取消</el-button>
           <el-button type="primary" @click="saveDeviceAuth">保存绑定</el-button>
         </div>
@@ -177,6 +179,7 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 import orgManagementServer from '../../api/servers/orgManagementServer.js'
 import deviceManagementServer from '../../api/servers/deviceManagementServer.js'
+import pluginsServer from '../../api/servers/pluginsServer.js'
 import AuthDeviceList from './components/AuthDeviceList.vue'
 import AuthInfo from './components/AuthInfo.vue'
 import PluginSelectionDialog from './components/PluginSelectionDialog.vue'
@@ -208,6 +211,7 @@ const licenseForm = reactive({
 const allDevices = ref([])
 const allManufacturers = ref([])
 const selectedDeviceIds = ref([])
+const selectedListDeviceIds = ref([])
 
 const authDeviceList = ref([])
 
@@ -566,6 +570,51 @@ const saveDeviceAuth = async () => {
     }
   } catch (e) {
     console.error(e)
+  }
+}
+
+const onSelectionChange = (selection) => {
+  selectedListDeviceIds.value = selection.map(item => item.id)
+}
+
+const handlePluginDownload = async () => {
+  if (selectedListDeviceIds.value.length === 0) {
+    ElMessage.warning('请选择要下载插件的仪器')
+    return
+  }
+  if (!activeOrgId.value) {
+    ElMessage.warning('请选择一个机构')
+    return
+  }
+  
+  try {
+    const res = await pluginsServer.pluginsDownloads({
+      deviceIds: selectedListDeviceIds.value,
+      organizationId: Number(activeOrgId.value)
+    })
+
+    const blob = res.data
+    const contentDisposition = res.headers['content-disposition']
+    let fileName = `plugins_${Date.now()}.zip`
+    if (contentDisposition) {
+      const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/)
+      if (fileNameMatch && fileNameMatch.length === 2) {
+        fileName = decodeURIComponent(fileNameMatch[1])
+      }
+    }
+    
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    
+  } catch (e) {
+    console.error(e)
+    ElMessage.error('下载失败')
   }
 }
 </script>

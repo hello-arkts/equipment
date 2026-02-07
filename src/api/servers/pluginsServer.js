@@ -33,5 +33,15 @@ export default {
       url: `${apiConfig.deviceManagement}/api/plugins/${id}`,
       method: 'delete',
     })
+  },
+  // 下载插件
+  pluginsDownloads(data) {
+    return axiosApi({
+      url: `${apiConfig.deviceManagement}/api/downloads`,
+      method: 'post',
+      data,
+      responseType: 'blob',
+      originalRes: true
+    })
   }
 }

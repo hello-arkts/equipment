@@ -92,6 +92,9 @@
         <el-form-item label="仪器编码">
           <el-input v-model="deviceForm.code" placeholder="请输入仪器编码" />
         </el-form-item>
+        <el-form-item label="仪器型号">
+          <el-input v-model="deviceForm.model" placeholder="请输入仪器型号" />
+        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -137,6 +140,7 @@ const deviceForm = reactive({
   id: '',
   name: '',
   code: '',
+  model: '',
   manufacturerId: ''
 })
 
@@ -251,6 +255,7 @@ const onAddDevice = () => {
   deviceForm.id = ''
   deviceForm.name = ''
   deviceForm.code = ''
+  deviceForm.model = ''
   deviceForm.manufacturerId = activeManufacturerId.value
   deviceDialogVisible.value = true
 }
@@ -260,6 +265,7 @@ const onEditDevice = (row) => {
   deviceForm.id = row.id
   deviceForm.name = row.name
   deviceForm.code = row.code || ''
+  deviceForm.model = row.model
   deviceForm.manufacturerId = activeManufacturerId.value
   deviceDialogVisible.value = true
 }
@@ -274,6 +280,7 @@ const closeDeviceDialog = () => {
       id: deviceForm.id,
       name: deviceForm.name,
       code: deviceForm.code,
+      model: deviceForm.model,
       manufacturerId: deviceForm.manufacturerId
     }
     let res

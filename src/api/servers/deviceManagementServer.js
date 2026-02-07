@@ -40,10 +40,11 @@ export default {
     })
   },
   //更新仪器
-  devicesPut(id) {
+  devicesPut(params) {
     return axiosApi({
-      url: `${apiConfig.deviceManagement}/api/devices/${id}`,
+      url: `${apiConfig.deviceManagement}/api/devices/${params.id}`,
       method: 'put',
+      data:params
     })
   },
   //添加仪器

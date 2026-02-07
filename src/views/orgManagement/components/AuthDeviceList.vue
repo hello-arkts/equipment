@@ -5,12 +5,19 @@ defineProps({
     default: () => []
   }
 })
-defineEmits(['switch-plugin', 'delete'])
+defineEmits(['switch-plugin', 'delete', 'selection-change'])
 </script>
 
 <template>
-  <el-table :data="rows" border style="width: 100%; height: 100%" class="w-full h-full">
-    <el-table-column type="index" label="#" width="50" align="center" />
+  <el-table 
+    :data="rows" 
+    border 
+    style="width: 100%; height: 100%" 
+    class="w-full h-full"
+    @selection-change="$emit('selection-change', $event)"
+  >
+    <el-table-column type="selection" width="55" align="center" />
+    <el-table-column type="index" label="序号" width="60" align="center" />
     <el-table-column prop="ordName" label="厂家名称" min-width="150" />
     <el-table-column prop="deviceName" label="仪器名称" min-width="150" />
     <el-table-column prop="deviceModel" label="仪器型号" min-width="150" />
