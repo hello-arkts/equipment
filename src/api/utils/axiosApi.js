@@ -48,5 +48,5 @@ service.interceptors.response.use(
 export const axiosApi = (config = {}) => service({ ...config })
 
 export const apiConfig = {
-    deviceManagement:'/yiqi'
+    deviceManagement:'/yiqi-api'
 }

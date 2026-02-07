@@ -58,7 +58,7 @@ export default {
   //删除仪器
   devicesDelete(id) {
     return axiosApi({
-      url: `${apiConfig.deviceManagement}/devices${id}`,
+      url: `${apiConfig.deviceManagement}/devices/${id}`,
       method: 'delete',
     })
   },
