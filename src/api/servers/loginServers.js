@@ -17,4 +17,11 @@ export default {
             data:params,
         })
     },
+    //获取验证码
+    getCaptcha(){
+        return axiosApi({
+            url: `${apiConfig.deviceManagement}/auth/captcha`,
+            method: 'get',
+        })
+    }
 }

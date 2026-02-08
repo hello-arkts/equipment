@@ -15,8 +15,30 @@
             type="password"
             placeholder="请输入密码"
             show-password
-            @keyup.enter="handleLogin"
           />
+        </el-form-item>
+        <el-form-item prop="captcha">
+          <div style="display: flex; width: 100%; gap: 10px;">
+            <el-input
+                v-model="loginForm.captcha"
+                :prefix-icon="Lock"
+                placeholder="请输入验证码"
+                @keyup.enter="handleLogin"
+                style="flex: 1;"
+            />
+            <el-image 
+              :src="captchaImg" 
+              style="width: 120px; height: 32px; cursor: pointer; border-radius: 4px;" 
+              @click="getCaptcha" 
+              title="点击刷新验证码"
+            >
+              <template #error>
+                <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; background: #f5f7fa; color: #909399; font-size: 12px;">
+                  加载失败
+                </div>
+              </template>
+            </el-image>
+          </div>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :loading="loading" class="login-button" @click="handleLogin">
@@ -29,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import {ref, reactive, onMounted} from 'vue'
 import { useRouter } from 'vue-router'
 import { User, Lock } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -38,10 +60,13 @@ import loginServers from '../../api/servers/loginServers'
 const router = useRouter()
 const loginFormRef = ref(null)
 const loading = ref(false)
+const captchaImg = ref('')
 
 const loginForm = reactive({
   username: '',
-  password: ''
+  password: '',
+  captchaKey:'',
+  captcha:''
 })
 
 const rules = {
@@ -79,6 +104,22 @@ const handleLogin = async () => {
     }
   })
 }
+
+const getCaptcha = async () => {
+  try {
+    const res = await loginServers.getCaptcha()
+    if (res.code == 200){
+      captchaImg.value = res.data.captchaImage
+      loginForm.captchaKey = res.data.captchaKey
+    }
+  } catch (error) {
+    console.error('获取验证码失败:', error)
+  }
+}
+
+onMounted(() =>{
+  getCaptcha()
+})
 </script>
 
 <style scoped>

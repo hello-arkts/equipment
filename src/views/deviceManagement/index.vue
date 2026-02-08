@@ -11,6 +11,7 @@
             :data="treeData"
             :props="defaultProps"
             highlight-current
+            node-key="id"
             :expand-on-click-node="false"
             default-expand-all
             :filter-node-method="filterNode"
@@ -120,9 +121,9 @@ import PluginDetailDialog from './components/PluginDetailDialog.vue'
 
 const manufacturerSearch = ref('')
 const activeNode = ref('')
-const manufacturerEditing = ref(false)
 const activeManufacturerId = ref('')
 const leftTableData = ref([])
+const treeRef = ref(null)
 const defaultProps = { children: 'children', label: 'label' }
 
 // Manufacturer Dialog
@@ -194,14 +195,12 @@ const getManufacturersPage = async (name = '', autoSelect = false) => {
     if (autoSelect) {
       const first = leftTableData.value[0]
       if (first) {
-        activeManufacturerId.value = first.id
-        activeNode.value = first.name || ''
-        Object.assign(manufacturerForm, {
-            id: first.id,
-            name: first.name || '',
-        })
-        manufacturerEditing.value = false
-        await getDevicesPage(first.id, first.name, deviceSearch.value)
+        setTimeout(() => {
+          if (treeRef.value) {
+            treeRef.value.setCurrentKey(first.id)
+            onNodeClick({ id: first.id, label: first.name })
+          }
+        }, 0)
       }
     }
   }

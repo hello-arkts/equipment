@@ -238,8 +238,7 @@ const onNodeClick = async (node) => {
     id: node.id,
     name: node.label || '',
   })
-  
-  // Fetch authorization info for the right panel list
+
    try {
      const res = await orgManagementServer.authorizationsPage({
          organizationId: node.id,
@@ -251,7 +250,7 @@ const onNodeClick = async (node) => {
        authDeviceList.value = (data.devices || []).map(d => ({
          id: d.id,
          pluginId: d.pluginId,
-         defaultPluginId: d.plugin?.id, // Store default plugin ID from API
+         defaultPluginId: d.plugin?.id,
          deviceName: d.name,
          deviceCode: d.code,
          createTime: d.createTime,
@@ -259,7 +258,6 @@ const onNodeClick = async (node) => {
          deviceModel: d.model,
          jarName: d.plugin?.jarName,
          pluginVersion: d.plugin?.version,
-         // 如果接口返回的数据中没有过期时间，可能需要从 authorization 对象或其他地方获取，这里暂且留空或根据业务逻辑调整
          expireTime: data.authorization ? data.authorization.expireTime : '' 
        }))
        
@@ -302,7 +300,6 @@ const getOrgsPage = async (name = '', autoSelect = false) => {
     if (autoSelect) {
       const firstOrg = leftTableData.value[0]
       if (firstOrg) {
-        // We need to wait for tree to render to set current key
         setTimeout(() => {
           if (treeRef.value) {
             treeRef.value.setCurrentKey(firstOrg.id)
@@ -310,6 +307,13 @@ const getOrgsPage = async (name = '', autoSelect = false) => {
           }
         }, 0)
       }
+    } else if (activeOrgId.value) {
+      // 刷新后保持选中状态
+      setTimeout(() => {
+        if (treeRef.value) {
+          treeRef.value.setCurrentKey(activeOrgId.value)
+        }
+      }, 0)
     }
   }
 }
@@ -409,6 +413,12 @@ const saveOrg = async () => {
     }
     if (res.code === 200) {
       ElMessage.success(orgDialogMode.value === 'add' ? '添加成功' : '保存成功')
+      
+      // Update activeNode if we just edited the currently selected org
+      if (orgDialogMode.value === 'edit' && orgForm.id === activeOrgId.value) {
+        activeNode.value = orgForm.name
+      }
+
       orgDialogVisible.value = false
       getOrgsPage(orgSearch.value, false)
     }
@@ -559,6 +569,8 @@ const saveLicense = async () => {
     })
     if (res.code === 200) {
       ElMessage.success('有效期设置成功')
+      // 刷新列表，但不自动改变选中状态
+      getOrgsPage(orgSearch.value, false)
     }
   } catch (e) {
     console.error(e)
