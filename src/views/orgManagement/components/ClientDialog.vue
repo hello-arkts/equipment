@@ -19,10 +19,6 @@
           <span class="label">创建时间：</span>
           <span class="value">{{ clientInfo.createTime || '-' }}</span>
         </div>
-        <div class="info-item">
-          <span class="label">更新时间：</span>
-          <span class="value">{{ clientInfo.updateTime || '-' }}</span>
-        </div>
       </div>
 
       <div class="actions">
@@ -30,9 +26,10 @@
             type="primary" 
             :icon="Download" 
             v-if="clientInfo"
+            :loading="downloadLoading"
             @click="handleDownload"
         >
-            下载客户端
+            {{ downloadLoading ? '下载中...' : '下载客户端' }}
         </el-button>
         <el-upload
             class="upload-demo"
@@ -41,8 +38,11 @@
             :show-file-list="false"
             :on-change="handleUpload"
             accept=".zip,.exe"
+            :disabled="uploadLoading"
         >
-            <el-button type="success" :icon="Upload">上传/更新客户端</el-button>
+            <el-button type="success" :icon="Upload" :loading="uploadLoading">
+                {{ uploadLoading ? '上传中...' : '上传/更新客户端' }}
+            </el-button>
         </el-upload>
       </div>
     </div>
@@ -72,6 +72,8 @@ const emit = defineEmits(['update:modelValue'])
 
 const visible = ref(false)
 const loading = ref(false)
+const downloadLoading = ref(false)
+const uploadLoading = ref(false)
 const clientInfo = ref(null)
 
 watch(() => props.modelValue, (val) => {
@@ -103,12 +105,13 @@ const fetchClientInfo = async () => {
 }
 
 const handleDownload = async () => {
+  downloadLoading.value = true
   try {
     const res = await clientServers.clientDownload()
     if (!res) return
 
     const blob = res.data
-    let fileName = 'client.zip'
+    let fileName = clientInfo.value.fileName
 
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -122,6 +125,8 @@ const handleDownload = async () => {
   } catch (error) {
     console.error(error)
     ElMessage.error('下载失败')
+  } finally {
+    downloadLoading.value = false
   }
 }
 
@@ -131,6 +136,7 @@ const handleUpload = async (file) => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(async () => {
+     uploadLoading.value = true
      const formData = new FormData()
      formData.append('file', file.raw)
      
@@ -145,6 +151,8 @@ const handleUpload = async (file) => {
      } catch (e) {
          console.error(e)
          ElMessage.error('上传请求失败')
+     } finally {
+        uploadLoading.value = false
      }
   }).catch(() => {
       // 取消上传
