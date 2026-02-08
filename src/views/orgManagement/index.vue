@@ -100,9 +100,9 @@
       draggable
       @close="closeOrgDialog"
     >
-      <el-form :model="orgForm" label-width="80px">
+      <el-form :model="orgForm" label-width="80px" @submit.prevent>
         <el-form-item label="机构名称">
-          <el-input v-model="orgForm.name" placeholder="请输入机构名称" />
+          <el-input v-model="orgForm.name" placeholder="请输入机构名称" @keydown.enter.prevent="saveOrg" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -152,7 +152,7 @@
               />
             </el-form-item>
           <el-form-item label="授权码">
-            <el-input v-model="licenseForm.licenseKey" placeholder="请输入授权码" />
+            <el-input type="password" show-password v-model="licenseForm.licenseKey" placeholder="请输入授权码" />
           </el-form-item>
         </el-form>
         <template #footer>
@@ -419,8 +419,6 @@ const saveOrg = async () => {
     }
     if (res.code === 200) {
       ElMessage.success(orgDialogMode.value === 'add' ? '添加成功' : '保存成功')
-      
-      // Update activeNode if we just edited the currently selected org
       if (orgDialogMode.value === 'edit' && orgForm.id === activeOrgId.value) {
         activeNode.value = orgForm.name
       }
@@ -446,11 +444,6 @@ const openAssignDeviceDialog = async () => {
 
 const closeAssignDeviceDialog = () => {
   assignDeviceDialogVisible.value = false
-}
-
-// Auth Actions
-const closeAuthDialog = () => {
-  // Not used anymore
 }
 
 const getOrgAuthorization = async (orgId) => {

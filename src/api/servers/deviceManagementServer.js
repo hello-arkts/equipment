@@ -10,10 +10,11 @@ export default {
     })
   },
   //更新厂家
-  manufacturersPut(id) {
+  manufacturersPut(params) {
     return axiosApi({
-      url: `${apiConfig.deviceManagement}/manufacturers/update/${id}`, // 直接使用绝对路径
+      url: `${apiConfig.deviceManagement}/manufacturers/update/${params.id}`, // 直接使用绝对路径
       method: 'post',
+      data:params
     })
   },
   //添加厂家

@@ -4,9 +4,9 @@
       <div class="login-header">
         <h2>系统登录</h2>
       </div>
-      <el-form :model="loginForm" :rules="rules" ref="loginFormRef" label-width="0px" class="login-form">
+      <el-form :model="loginForm" :rules="rules" ref="loginFormRef" label-width="0px" class="login-form" @submit.prevent>
         <el-form-item prop="username">
-          <el-input v-model="loginForm.username" :prefix-icon="User" placeholder="请输入用户名" />
+          <el-input v-model="loginForm.username" :prefix-icon="User" placeholder="请输入用户名" @keydown.enter.prevent />
         </el-form-item>
         <el-form-item prop="password">
           <el-input
@@ -15,6 +15,7 @@
             type="password"
             placeholder="请输入密码"
             show-password
+            @keydown.enter.prevent="handleLogin"
           />
         </el-form-item>
         <el-form-item prop="captcha">
@@ -23,7 +24,7 @@
                 v-model="loginForm.captcha"
                 :prefix-icon="Lock"
                 placeholder="请输入验证码"
-                @keyup.enter="handleLogin"
+                @keydown.enter.prevent="handleLogin"
                 style="flex: 1;"
             />
             <el-image 

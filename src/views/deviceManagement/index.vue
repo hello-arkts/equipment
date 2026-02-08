@@ -64,9 +64,9 @@
       draggable
       @close="closeManufacturerDialog"
     >
-      <el-form :model="manufacturerForm" label-width="80px">
+      <el-form :model="manufacturerForm" label-width="80px" @submit.prevent>
         <el-form-item label="厂家名称">
-          <el-input v-model="manufacturerForm.name" placeholder="请输入厂家名称" />
+          <el-input v-model="manufacturerForm.name" placeholder="请输入厂家名称" @keydown.enter.prevent="saveManufacturer" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -83,18 +83,18 @@
       draggable
       @close="closeDeviceDialog"
     >
-      <el-form :model="deviceForm" label-width="80px">
+      <el-form :model="deviceForm" label-width="80px" @submit.prevent>
         <el-form-item label="生产厂家">
            <el-input v-model="activeNode" disabled />
         </el-form-item>
         <el-form-item label="仪器名称">
-          <el-input v-model="deviceForm.name" placeholder="请输入仪器名称" />
+          <el-input v-model="deviceForm.name" placeholder="请输入仪器名称" @keydown.enter.prevent />
         </el-form-item>
         <el-form-item label="仪器编码">
-          <el-input v-model="deviceForm.code" placeholder="请输入仪器编码" />
+          <el-input v-model="deviceForm.code" placeholder="请输入仪器编码" @keydown.enter.prevent />
         </el-form-item>
         <el-form-item label="仪器型号">
-          <el-input v-model="deviceForm.model" placeholder="请输入仪器型号" />
+          <el-input v-model="deviceForm.model" placeholder="请输入仪器型号" @keydown.enter.prevent="saveDevice" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -172,11 +172,7 @@ const onNodeClick = async (node) => {
 const deviceSearch = ref('')
 const tableData = ref([])
 const filteredTableData = computed(() => {
-  let rows = tableData.value
-  if (activeNode.value) {
-    rows = rows.filter(r => r.manufacturer === activeNode.value)
-  }
-  return rows
+  return tableData.value
 })
 
 const filterNode = (value, data) => {
@@ -392,7 +388,17 @@ const saveManufacturer = async () => {
     if (res.code === 200) {
       ElMessage.success(manufacturerDialogMode.value === 'add' ? '添加成功' : '保存成功')
       manufacturerDialogVisible.value = false
-      getManufacturersPage(manufacturerSearch.value, false)
+      
+      // 1. 等待树刷新完成
+      await getManufacturersPage(manufacturerSearch.value, false)
+      
+      // 2. 如果编辑的是当前选中的厂家，同步更新右侧状态和列表
+      if (manufacturerDialogMode.value === 'edit' && manufacturerForm.id === activeManufacturerId.value) {
+        // 更新当前选中的名称状态
+        activeNode.value = manufacturerForm.name 
+        // 刷新右侧列表以显示最新的厂家名称
+        getDevicesPage(activeManufacturerId.value, activeNode.value, deviceSearch.value)
+      }
     }
   } catch (e) {
     console.error(e)
