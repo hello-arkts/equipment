@@ -34,7 +34,16 @@ export default {
       method: 'post',
     })
   },
-  // 下载插件
+  // 下载插件(单个)
+  pluginsDownloadsId(id) {
+    return axiosApi({
+      url: `${apiConfig.deviceManagement}/plugins/download/${id}`,
+      method: 'get',
+      responseType: 'blob',
+      originalRes: true
+    })
+  },
+  // 下载插件(批量)
   pluginsDownloads(data) {
     return axiosApi({
       url: `${apiConfig.deviceManagement}/downloads`,

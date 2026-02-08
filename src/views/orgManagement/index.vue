@@ -61,6 +61,7 @@
                <span v-if="activeNode" class="text-gray-500 text-sm">({{ activeNode }})</span>
             </div>
             <div v-if="activeTab === 'devices'">
+              <el-button type="primary" @click="clientDialogVisible = true">客户端</el-button>
               <el-button type="primary" @click="handlePluginDownload">插件下载</el-button>
               <el-button type="primary" @click="openAssignDeviceDialog">仪器绑定</el-button>
             </div>
@@ -170,6 +171,9 @@
       :default-plugin-id="currentSwitchDevice?.defaultPluginId"
       @confirm="handlePluginSwitch"
     />
+
+    <!-- 客户端信息弹窗 -->
+    <ClientDialog v-model="clientDialogVisible" />
   </div>
 </template>
 
@@ -184,6 +188,7 @@ import AuthDeviceList from './components/AuthDeviceList.vue'
 import AuthInfo from './components/AuthInfo.vue'
 import PluginSelectionDialog from './components/PluginSelectionDialog.vue'
 import DeviceAuthTransfer from './components/DeviceAuthTransfer.vue'
+import ClientDialog from './components/ClientDialog.vue'
 
 const orgSearch = ref('')
 const activeNode = ref('')
@@ -219,6 +224,7 @@ const assignDeviceDialogVisible = ref(false)
 const pluginSelectionDialogVisible = ref(false)
 const currentSwitchDevice = ref(null)
 const licenseDialogVisible = ref(false)
+const clientDialogVisible = ref(false)
 
 const treeData = computed(() => [
   {

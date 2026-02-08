@@ -15,8 +15,9 @@
         <el-table-column prop="jarName" label="插件名称" min-width="150" />
         <el-table-column prop="version" label="版本号" width="120" />
         <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
-        <el-table-column label="操作" width="150" align="center" fixed="right">
+        <el-table-column label="操作" width="200" align="center" fixed="right">
           <template #default="{ row }">
+            <el-button type="primary" link size="small" @click="onDownload(row)">下载</el-button>
             <el-button type="primary" link size="small" @click="onEdit(row)">编辑</el-button>
             <el-button type="danger" link size="small" @click="onDelete(row)">删除</el-button>
           </template>
@@ -226,6 +227,30 @@ const onSave = async () => {
     }
   } catch (e) {
     console.error(e)
+  }
+}
+
+const onDownload = async (row) => {
+  try {
+    const res = await pluginsServer.pluginsDownloadsId(row.id)
+    
+    if (!res) return
+
+    const blob = res.data
+    let fileName = row.jarName
+    
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    ElMessage.success('下载开始')
+  } catch (e) {
+    console.error(e)
+    ElMessage.error('下载失败')
   }
 }
 </script>
