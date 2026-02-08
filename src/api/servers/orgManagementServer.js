@@ -20,26 +20,24 @@ export default {
   // 更新机构
   orgsPut(params,id) {
     return axiosApi({
-      url: `${apiConfig.deviceManagement}/organizations/${id}`,
-      method: 'put',
+      url: `${apiConfig.deviceManagement}/organizations/update/${id}`,
+      method: 'post',
       data: params
     })
   },
   // 删除机构
   orgsDelete(id) {
     return axiosApi({
-      url: `${apiConfig.deviceManagement}/authorizations/${id}`,
-      method: 'delete',
+      url: `${apiConfig.deviceManagement}/organizations/delete/${id}`,
+      method: 'post',
     })
   },
   // 机构授权列表查询
   authorizationsPage(params) {
-    // Determine if we should use organizationId or orgId (unify usage)
     const id = params.organizationId || params.orgId
     return axiosApi({
       url: `${apiConfig.deviceManagement}/authorizations/${id}`,
       method: 'get',
-      // If we need to pass query params like timestamp
       params: {
         _t: params._t
       }
@@ -64,6 +62,14 @@ export default {
   authorizationsSetDefault(params) {
     return axiosApi({
       url: `${apiConfig.deviceManagement}/authorizations/setDefaultPlugin`,
+      method: 'post',
+      data: params
+    })
+  },
+  //解除仪器绑定
+  authorizationsCancel(params) {
+    return axiosApi({
+      url: `${apiConfig.deviceManagement}/authorizations/device/cancel`,
       method: 'post',
       data: params
     })

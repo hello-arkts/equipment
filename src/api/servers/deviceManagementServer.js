@@ -12,8 +12,8 @@ export default {
   //更新厂家
   manufacturersPut(id) {
     return axiosApi({
-      url: `${apiConfig.deviceManagement}/manufacturers/${id}`, // 直接使用绝对路径
-      method: 'put',
+      url: `${apiConfig.deviceManagement}/manufacturers/update/${id}`, // 直接使用绝对路径
+      method: 'post',
     })
   },
   //添加厂家
@@ -27,8 +27,8 @@ export default {
   //删除厂家
   manufacturersDelete(id) {
     return axiosApi({
-      url: `${apiConfig.deviceManagement}/manufacturers${id}`, // 直接使用绝对路径
-      method: 'delete',
+      url: `${apiConfig.deviceManagement}/manufacturers/delete/${id}`, // 直接使用绝对路径
+      method: 'post',
     })
   },
   //仪器查询
@@ -42,8 +42,8 @@ export default {
   //更新仪器
   devicesPut(params) {
     return axiosApi({
-      url: `${apiConfig.deviceManagement}/devices/${params.id}`,
-      method: 'put',
+      url: `${apiConfig.deviceManagement}/devices/update/${params.id}`,
+      method: 'post',
       data:params
     })
   },
@@ -58,8 +58,8 @@ export default {
   //删除仪器
   devicesDelete(id) {
     return axiosApi({
-      url: `${apiConfig.deviceManagement}/devices/${id}`,
-      method: 'delete',
+      url: `${apiConfig.deviceManagement}/devices/delete/${id}`,
+      method: 'post',
     })
   },
 }

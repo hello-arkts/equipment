@@ -1,4 +1,5 @@
 import axios from 'axios'
+import router from '../../router'
 
 const service = axios.create({
     baseURL:'',
@@ -35,12 +36,24 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response) => {
     if (response.config.originalRes) return response
-    return response.data
+    const d = response.data
+    if (d && typeof d === 'object' && (d.code === 401 || d.code === 403)) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('username')
+      router.push('/login')
+      return Promise.reject(d)
+    }
+    return d
   },
   (error) => {
-    const code = error.response?.status || 0
+    const code = error.response?.status || error.response?.data?.code || 0
     const message = error.response?.data?.message || error.message || 'Request Error'
     const data = error.response?.data
+    if (code === 401 || code === 403) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('username')
+      router.push('/login')
+    }
     return Promise.reject({ code, message, data })
   },
 )

@@ -21,8 +21,8 @@ export default {
   // 更新插件
   pluginsPut(params,id) {
     return axiosApi({
-      url: `${apiConfig.deviceManagement}/plugins/${id}`,
-      method: 'put',
+      url: `${apiConfig.deviceManagement}/plugins/update/${id}`,
+      method: 'post',
       data: params,
       formData: true
     })
@@ -30,8 +30,8 @@ export default {
   // 删除插件
   pluginsDelete(id) {
     return axiosApi({
-      url: `${apiConfig.deviceManagement}/plugins/${id}`,
-      method: 'delete',
+      url: `${apiConfig.deviceManagement}/plugins/delete/${id}`,
+      method: 'post',
     })
   },
   // 下载插件

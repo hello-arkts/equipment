@@ -10,5 +10,11 @@ export default defineConfig(()=>{
       vue(),
       tailwindcss(),
     ],
+    server: {
+      host: '0.0.0.0',
+      port: 5173,
+      open: true,
+      cors: true,
+    }
   }
 })

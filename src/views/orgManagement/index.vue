@@ -531,9 +531,22 @@ const onDeleteAuth = (row) => {
     confirmButtonText: '确定',
     cancelButtonText: '取消'
   }).then(async () => {
-    ElMessage.success('授权已取消')
-    // 刷新列表
-    getOrgAuthorization(activeOrgId.value)
+    try {
+      const res = await orgManagementServer.authorizationsCancel({
+        deviceId: row.id,
+        orgId: activeOrgId.value
+      })
+      if (res.code === 200) {
+        ElMessage.success('授权已取消')
+        // 刷新列表
+        getOrgAuthorization(activeOrgId.value)
+      } else {
+        ElMessage.error(res.message || '操作失败')
+      }
+    } catch (e) {
+      console.error(e)
+      ElMessage.error('请求失败')
+    }
   }).catch(() => {})
 }
 
