@@ -62,7 +62,9 @@
             </div>
             <div v-if="activeTab === 'devices'">
               <el-button type="primary" @click="clientDialogVisible = true">客户端</el-button>
-              <el-button type="primary" @click="handlePluginDownload">插件下载</el-button>
+              <el-button type="primary" :loading="pluginDownloadLoading" @click="handlePluginDownload">
+                {{ pluginDownloadLoading ? '下载中...' : '插件下载' }}
+              </el-button>
               <el-button type="primary" @click="openAssignDeviceDialog">仪器绑定</el-button>
             </div>
             <div v-else>
@@ -217,6 +219,7 @@ const allDevices = ref([])
 const allManufacturers = ref([])
 const selectedDeviceIds = ref([])
 const selectedListDeviceIds = ref([])
+const pluginDownloadLoading = ref(false)
 
 const authDeviceList = ref([])
 
@@ -618,6 +621,7 @@ const handlePluginDownload = async () => {
     return
   }
   
+  pluginDownloadLoading.value = true
   try {
     const res = await pluginsServer.pluginsDownloads({
       deviceIds: selectedListDeviceIds.value,
@@ -645,6 +649,8 @@ const handlePluginDownload = async () => {
     
   } catch (e) {
     console.error(e)
+  } finally {
+    pluginDownloadLoading.value = false
   }
 }
 </script>
