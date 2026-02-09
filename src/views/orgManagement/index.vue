@@ -634,7 +634,7 @@ const handlePluginDownload = async () => {
     if (contentDisposition) {
       const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/)
       if (fileNameMatch && fileNameMatch.length === 2) {
-        fileName = decodeURIComponent(fileNameMatch[1])
+        fileName = decodeURIComponent(fileNameMatch[1].split(/\.zip/)[0])
       }
     }
     
