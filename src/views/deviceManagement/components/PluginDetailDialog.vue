@@ -34,7 +34,7 @@
       append-to-body
     >
       <el-form :model="form" label-width="80px">
-        <el-form-item label="版本号">
+        <el-form-item label="版本号" required>
           <el-input v-model="form.version" placeholder="请输入版本号" />
         </el-form-item>
         <el-form-item label="描述">
@@ -156,26 +156,20 @@ const onEdit = (row) => {
 }
 
 const onDelete = (row) => {
-  ElMessageBox.confirm(`确定删除插件「${row.name}」吗？`, '删除确认', {
+  ElMessageBox.confirm(`确定删除插件「${row.jarName}」吗？`, '删除确认', {
     type: 'warning',
     confirmButtonText: '确定',
     cancelButtonText: '取消'
-  }).then(() => {
-    ElMessageBox.confirm('请再次确认是否真的要删除？', '二次确认', {
-      type: 'warning',
-      confirmButtonText: '确定',
-      cancelButtonText: '取消'
-    }).then(async () => {
-      try {
-        const res = await pluginsServer.pluginsDelete(row.id)
-        if (res.code === 200) {
-          ElMessage.success('删除成功')
-          loadPlugins()
-        }
-      } catch (e) {
-        console.error(e)
+  }).then(async () => {
+    try {
+      const res = await pluginsServer.pluginsDelete(row.id)
+      if (res.code === 200) {
+        ElMessage.success('删除成功')
+        loadPlugins()
       }
-    }).catch(() => {})
+    } catch (e) {
+      console.error(e)
+    }
   }).catch(() => {})
 }
 
@@ -197,11 +191,17 @@ const onRemoveFile = () => {
 }
 
 const onSave = async () => {
-  // 校验文件
-  if (editMode.value === 'add' && !form.file) {
-    ElMessage.warning('请上传插件文件 (.jar)')
-    return
-  }
+      // 校验版本号
+      if (!form.version) {
+        ElMessage.warning('请输入版本号')
+        return
+      }
+
+      // 校验文件
+      if (editMode.value === 'add' && !form.file) {
+        ElMessage.warning('请上传插件文件 (.jar)')
+        return
+      }
 
   try {
     const params = new FormData()

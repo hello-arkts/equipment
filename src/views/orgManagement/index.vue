@@ -547,26 +547,20 @@ const onDeleteAuth = (row) => {
     type: 'warning',
     confirmButtonText: '确定',
     cancelButtonText: '取消'
-  }).then(() => {
-    ElMessageBox.confirm('请再次确认是否真的要取消授权？', '二次确认', {
-      type: 'warning',
-      confirmButtonText: '确定',
-      cancelButtonText: '取消'
-    }).then(async () => {
-      try {
-        const res = await orgManagementServer.authorizationsCancel({
-          deviceId: row.id,
-          orgId: activeOrgId.value
-        })
-        if (res.code === 200) {
-          ElMessage.success('授权已取消')
-          // 刷新列表
-          getOrgAuthorization(activeOrgId.value)
-        }
-      } catch (e) {
-        console.error(e)
+  }).then(async () => {
+    try {
+      const res = await orgManagementServer.authorizationsCancel({
+        deviceId: row.id,
+        orgId: activeOrgId.value
+      })
+      if (res.code === 200) {
+        ElMessage.success('绑定已取消')
+        // 刷新列表
+        getOrgAuthorization(activeOrgId.value)
       }
-    }).catch(() => {})
+    } catch (e) {
+      console.error(e)
+    }
   }).catch(() => {})
 }
 
