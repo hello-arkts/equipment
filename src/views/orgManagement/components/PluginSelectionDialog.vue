@@ -101,7 +101,6 @@ const loadPlugins = async () => {
   } catch (e) {
     console.error(e)
     plugins.value = []
-    ElMessage.error('加载插件列表失败')
   } finally {
     loading.value = false
   }

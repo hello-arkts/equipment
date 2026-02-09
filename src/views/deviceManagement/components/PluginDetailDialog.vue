@@ -250,7 +250,6 @@ const onDownload = async (row) => {
     ElMessage.success('下载开始')
   } catch (e) {
     console.error(e)
-    ElMessage.error('下载失败')
   }
 }
 </script>

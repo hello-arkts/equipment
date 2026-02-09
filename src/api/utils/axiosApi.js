@@ -56,15 +56,41 @@ service.interceptors.response.use(
     return d
   },
   (error) => {
-    const code = error.response?.status || error.response?.data?.code || 0
-    const message = error.response?.data?.message || error.message || 'Request Error'
-    const data = error.response?.data
-    
+    const responseData = error.response?.data
+    const isObj = responseData && typeof responseData === 'object' && ! (responseData instanceof Blob)
+    const code = (isObj ? responseData.code : null) || error.response?.status || 0
+    let message = (isObj ? responseData.message : null)
+    if (responseData instanceof Blob && responseData.type === 'application/json') {
+        const reader = new FileReader()
+        reader.onload = () => {
+            try {
+                const res = JSON.parse(reader.result)
+                ElMessage.error(res.message || '操作失败')
+            } catch (e) {
+                ElMessage.error('操作失败')
+            }
+        }
+        reader.readAsText(responseData)
+        return Promise.reject({ code, message: '操作失败', data: null })
+    }
+
+    if (!message) {
+        if (typeof responseData === 'string') {
+            message = responseData
+        } else if (error.message && !error.message.includes('status code')) {
+             message = error.message
+        } else {
+             message = '操作失败'
+        }
+    }
+
+    const data = isObj ? responseData.data : null
+
     if (code === 401 || code === 403) {
       localStorage.removeItem('token')
       localStorage.removeItem('username')
       router.push('/login')
-      ElMessage.error('登录过期，请重新登录')
+      ElMessage.error(message || '登录过期，请重新登录')
     } else {
       ElMessage.error(message)
     }

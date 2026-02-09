@@ -93,12 +93,9 @@ const handleLogin = async () => {
             localStorage.setItem('username', loginForm.username)
           }
           router.push('/')
-        } else {
-          ElMessage.error(res.message || '登录失败')
         }
       } catch (error) {
         console.error(error)
-        ElMessage.error(error.message || '登录请求异常')
       } finally {
         loading.value = false
       }

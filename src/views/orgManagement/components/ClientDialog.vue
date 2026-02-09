@@ -124,7 +124,6 @@ const handleDownload = async () => {
     ElMessage.success('开始下载')
   } catch (error) {
     console.error(error)
-    ElMessage.error('下载失败')
   } finally {
     downloadLoading.value = false
   }
@@ -145,12 +144,9 @@ const handleUpload = async (file) => {
         if (res.code === 200) {
             ElMessage.success('上传成功')
             fetchClientInfo()
-        } else {
-            ElMessage.error(res.message || '上传失败')
         }
      } catch (e) {
          console.error(e)
-         ElMessage.error('上传请求失败')
      } finally {
         uploadLoading.value = false
      }

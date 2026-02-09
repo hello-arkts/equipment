@@ -530,7 +530,6 @@ const handlePluginSwitch = async (plugin) => {
     }
   } catch (e) {
     console.error(e)
-    ElMessage.error('切换插件失败')
   }
 }
 
@@ -549,12 +548,9 @@ const onDeleteAuth = (row) => {
         ElMessage.success('授权已取消')
         // 刷新列表
         getOrgAuthorization(activeOrgId.value)
-      } else {
-        ElMessage.error(res.message || '操作失败')
       }
     } catch (e) {
       console.error(e)
-      ElMessage.error('请求失败')
     }
   }).catch(() => {})
 }
@@ -636,7 +632,6 @@ const handlePluginDownload = async () => {
     
   } catch (e) {
     console.error(e)
-    ElMessage.error('下载失败')
   }
 }
 </script>
