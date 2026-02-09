@@ -566,6 +566,7 @@ const saveLicense = async () => {
       ElMessage.success('有效期设置成功')
       // 刷新列表，但不自动改变选中状态
       getOrgsPage(orgSearch.value, false)
+      onNodeClick({id: activeOrgId.value,label: activeNode.value})
     }
   } catch (e) {
     console.error(e)
