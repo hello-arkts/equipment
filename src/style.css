@@ -37,3 +37,11 @@ html, body {
 ::-webkit-scrollbar-thumb:hover {
   background: #c0c4cc;
 }
+
+/* 全局表格不换行，超出省略 */
+.el-table__cell,
+.el-table .cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

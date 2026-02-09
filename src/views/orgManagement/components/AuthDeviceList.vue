@@ -18,12 +18,12 @@ defineEmits(['switch-plugin', 'delete', 'selection-change'])
   >
     <el-table-column type="selection" width="55" align="center" />
     <el-table-column type="index" label="序号" width="60" align="center" />
-    <el-table-column prop="ordName" label="厂家名称" min-width="150" />
-    <el-table-column prop="deviceName" label="仪器名称" min-width="150" />
-    <el-table-column prop="deviceModel" label="仪器型号" min-width="150" />
-    <el-table-column prop="deviceCode" label="仪器编码" min-width="150" />
-    <el-table-column prop="jarName" label="默认插件包" min-width="150" />
-    <el-table-column prop="pluginVersion" label="插件版本号" min-width="150" />
+    <el-table-column prop="ordName" label="厂家名称" min-width="150" show-overflow-tooltip />
+    <el-table-column prop="deviceName" label="仪器名称" min-width="150" show-overflow-tooltip />
+    <el-table-column prop="deviceModel" label="仪器型号" min-width="150" show-overflow-tooltip />
+    <el-table-column prop="deviceCode" label="仪器编码" min-width="150" show-overflow-tooltip />
+    <el-table-column prop="jarName" label="默认插件包" min-width="150" show-overflow-tooltip />
+    <el-table-column prop="pluginVersion" label="插件版本号" min-width="150" show-overflow-tooltip />
     <el-table-column label="操作" width="200" align="center" fixed="right">
       <template #default="{ row }">
         <el-button type="primary" link size="small" @click="$emit('switch-plugin', row)">切换插件</el-button>

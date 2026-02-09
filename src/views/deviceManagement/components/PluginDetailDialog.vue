@@ -12,8 +12,8 @@
         <el-button type="primary" @click="onAddPlugin">添加插件</el-button>
       </div>
       <el-table :data="plugins" border stripe style="width: 100%; height: 100%; flex: 1" class="flex-1">
-        <el-table-column prop="jarName" label="插件名称" min-width="150" />
-        <el-table-column prop="version" label="版本号" width="120" />
+        <el-table-column prop="jarName" label="插件名称" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="version" label="版本号" width="120" show-overflow-tooltip />
         <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
         <el-table-column label="操作" width="200" align="center" fixed="right">
           <template #default="{ row }">
