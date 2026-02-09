@@ -297,18 +297,24 @@ const closeDeviceDialog = () => {
 }
 
 const onDeleteDevice = (row) => {
-  ElMessageBox.confirm(`确定删除仪器「${row.name}」吗？`, '删除确认', {
+  ElMessageBox.confirm(`删除仪器时会把仪器下面关联的插件、机构跟插件的绑定关系一并删除，确认要删除仪器「${row.name}」吗？`, '删除确认', {
     type: 'warning',
-    confirmButtonText: '删除',
+    confirmButtonText: '确定',
     cancelButtonText: '取消',
-  }).then(async () => {
-    const res = await deviceManagementServer.devicesDelete(row.id)
-    if (res.code === 200) {
-      ElMessage.success('已删除')
-      const id = activeManufacturerId.value || ''
-      const name = activeNode.value || ''
-      getDevicesPage(id, name, deviceSearch.value)
-    }
+  }).then(() => {
+    ElMessageBox.confirm('请再次确认是否真的要删除？', '二次确认', {
+      type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消'
+    }).then(async () => {
+      const res = await deviceManagementServer.devicesDelete(row.id)
+      if (res.code === 200) {
+        ElMessage.success('已删除')
+        const id = activeManufacturerId.value || ''
+        const name = activeNode.value || ''
+        getDevicesPage(id, name, deviceSearch.value)
+      }
+    }).catch(() => {})
   }).catch(() => {})
 }
 
@@ -352,24 +358,30 @@ const deleteManufacturer = (data) => {
       ElMessage.warning('请先选择一个厂家')
       return
   }
-  ElMessageBox.confirm(`确定删除厂家「${targetName}」及其关联仪器吗？`, '删除确认', {
+  ElMessageBox.confirm(`删除厂家时会把厂家下面关联的仪器、插件、机构跟插件的绑定关系一并删除，确认要删除厂家「${targetName}」吗？`, '删除确认', {
     type: 'warning',
-    confirmButtonText: '删除',
+    confirmButtonText: '确定',
     cancelButtonText: '取消',
-  }).then(async () => {
-    try {
-        const res = await deviceManagementServer.manufacturersDelete(targetId)
-        if (res.code === 200) {
-            ElMessage.success('厂家已删除')
-            if (activeManufacturerId.value === targetId) {
-                activeManufacturerId.value = ''
-                activeNode.value = ''
-            }
-            getManufacturersPage('', true)
-        }
-    } catch (e) {
-        console.error(e)
-    }
+  }).then(() => {
+    ElMessageBox.confirm('请再次确认是否真的要删除？', '二次确认', {
+      type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消'
+    }).then(async () => {
+      try {
+          const res = await deviceManagementServer.manufacturersDelete(targetId)
+          if (res.code === 200) {
+              ElMessage.success('厂家已删除')
+              if (activeManufacturerId.value === targetId) {
+                  activeManufacturerId.value = ''
+                  activeNode.value = ''
+              }
+              getManufacturersPage('', true)
+          }
+      } catch (e) {
+          console.error(e)
+      }
+    }).catch(() => {})
   }).catch(() => {})
 }
 

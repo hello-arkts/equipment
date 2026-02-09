@@ -384,24 +384,30 @@ const deleteOrg = (data) => {
       ElMessage.warning('请先选择一个机构')
       return
   }
-  ElMessageBox.confirm(`确定删除机构「${targetName}」吗？`, '删除确认', {
+  ElMessageBox.confirm(`删除机构时会把机构下面关联的授权信息一并删除，确认要删除机构「${targetName}」吗？`, '删除确认', {
     type: 'warning',
-    confirmButtonText: '删除',
+    confirmButtonText: '确定',
     cancelButtonText: '取消',
-  }).then(async () => {
-    try {
-        const res = await orgManagementServer.orgsDelete(targetId)
-        if (res.code === 200) {
-            ElMessage.success('机构已删除')
-            if (activeOrgId.value === targetId) {
-                activeOrgId.value = ''
-                activeNode.value = ''
-            }
-            getOrgsPage('', true)
-        }
-    } catch (e) {
-        console.error(e)
-    }
+  }).then(() => {
+    ElMessageBox.confirm('请再次确认是否真的要删除？', '二次确认', {
+      type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消'
+    }).then(async () => {
+      try {
+          const res = await orgManagementServer.orgsDelete(targetId)
+          if (res.code === 200) {
+              ElMessage.success('机构已删除')
+              if (activeOrgId.value === targetId) {
+                  activeOrgId.value = ''
+                  activeNode.value = ''
+              }
+              getOrgsPage('', true)
+          }
+      } catch (e) {
+          console.error(e)
+      }
+    }).catch(() => {})
   }).catch(() => {})
 }
 
@@ -538,20 +544,26 @@ const onDeleteAuth = (row) => {
     type: 'warning',
     confirmButtonText: '确定',
     cancelButtonText: '取消'
-  }).then(async () => {
-    try {
-      const res = await orgManagementServer.authorizationsCancel({
-        deviceId: row.id,
-        orgId: activeOrgId.value
-      })
-      if (res.code === 200) {
-        ElMessage.success('授权已取消')
-        // 刷新列表
-        getOrgAuthorization(activeOrgId.value)
+  }).then(() => {
+    ElMessageBox.confirm('请再次确认是否真的要取消授权？', '二次确认', {
+      type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消'
+    }).then(async () => {
+      try {
+        const res = await orgManagementServer.authorizationsCancel({
+          deviceId: row.id,
+          orgId: activeOrgId.value
+        })
+        if (res.code === 200) {
+          ElMessage.success('授权已取消')
+          // 刷新列表
+          getOrgAuthorization(activeOrgId.value)
+        }
+      } catch (e) {
+        console.error(e)
       }
-    } catch (e) {
-      console.error(e)
-    }
+    }).catch(() => {})
   }).catch(() => {})
 }
 

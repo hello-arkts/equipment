@@ -158,18 +158,24 @@ const onEdit = (row) => {
 const onDelete = (row) => {
   ElMessageBox.confirm(`确定删除插件「${row.name}」吗？`, '删除确认', {
     type: 'warning',
-    confirmButtonText: '删除',
+    confirmButtonText: '确定',
     cancelButtonText: '取消'
-  }).then(async () => {
-    try {
-      const res = await pluginsServer.pluginsDelete(row.id)
-      if (res.code === 200) {
-        ElMessage.success('删除成功')
-        loadPlugins()
+  }).then(() => {
+    ElMessageBox.confirm('请再次确认是否真的要删除？', '二次确认', {
+      type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消'
+    }).then(async () => {
+      try {
+        const res = await pluginsServer.pluginsDelete(row.id)
+        if (res.code === 200) {
+          ElMessage.success('删除成功')
+          loadPlugins()
+        }
+      } catch (e) {
+        console.error(e)
       }
-    } catch (e) {
-      console.error(e)
-    }
+    }).catch(() => {})
   }).catch(() => {})
 }
 
