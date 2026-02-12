@@ -13,6 +13,7 @@
       </div>
       <el-table :data="plugins" border stripe style="width: 100%; height: 100%; flex: 1" class="flex-1">
         <el-table-column prop="jarName" label="插件名称" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="version" label="版本号" width="120" show-overflow-tooltip />
         <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
         <el-table-column prop="updateTime" label="更新时间" width="120" show-overflow-tooltip />
         <el-table-column label="操作" width="150" align="center" fixed="right">
@@ -98,6 +99,7 @@ const fileList = ref([])
 const form = reactive({
   id: '',
   name: '',
+  version: '',
   description: '',
   file: null
 })
@@ -129,10 +131,22 @@ const loadPlugins = async () => {
   }
 }
 
+const generateVersion = () => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  const hour = String(now.getHours()).padStart(2, '0')
+  const minute = String(now.getMinutes()).padStart(2, '0')
+  const second = String(now.getSeconds()).padStart(2, '0')
+  return `${year}${month}${day}${hour}${minute}${second}`
+}
+
 const onAddPlugin = () => {
   editMode.value = 'add'
   form.id = ''
   form.name = ''
+  form.version = generateVersion()
   form.description = ''
   form.file = null
   fileList.value = []
@@ -143,6 +157,7 @@ const onEdit = (row) => {
   editMode.value = 'edit'
   form.id = row.id
   form.name = row.name
+  form.version = generateVersion() // 编辑时也重新生成版本号
   form.description = row.description
   form.file = null
   fileList.value = []
@@ -185,14 +200,18 @@ const onRemoveFile = () => {
 }
 
 const onSave = async () => {
-      // 校验文件
-      if (editMode.value === 'add' && !form.file) {
-        ElMessage.warning('请上传插件文件 (.jar)')
-        return
-      }
+  // 校验文件
+  if (editMode.value === 'add' && !form.file) {
+    ElMessage.warning('请上传插件文件 (.jar)')
+    return
+  }
 
   try {
+    // 每次保存前重新生成一次版本号，确保是最新的时间
+    form.version = generateVersion()
+
     const params = new FormData()
+    params.append('version', form.version)
     params.append('description', form.description)
     params.append('deviceId', props.device.id)
     

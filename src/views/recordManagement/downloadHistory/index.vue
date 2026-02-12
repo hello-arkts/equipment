@@ -52,7 +52,7 @@
       v-model="drawerVisible"
       title="下载详情"
       direction="rtl"
-      size="600px"
+      size="800px"
       class="detail-drawer"
     >
       <div class="drawer-content">
@@ -68,7 +68,7 @@
               <el-table-column prop="deviceName" label="设备名称" show-overflow-tooltip />
               <el-table-column prop="deviceModel" label="设备型号" show-overflow-tooltip />
               <el-table-column prop="pluginJar" label="插件文件" show-overflow-tooltip />
-              <el-table-column prop="pluginVersion" label="版本" width="100" show-overflow-tooltip />
+              <el-table-column prop="pluginDescription" label="插件描述" width="250" show-overflow-tooltip />
             </el-table>
           </div>
         </div>

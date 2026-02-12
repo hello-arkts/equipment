@@ -23,8 +23,8 @@ defineEmits(['switch-plugin', 'delete', 'selection-change'])
     <el-table-column prop="deviceModel" label="仪器型号" min-width="150" show-overflow-tooltip />
     <el-table-column prop="deviceCode" label="仪器编码" min-width="150" show-overflow-tooltip />
     <el-table-column prop="jarName" label="默认插件包" min-width="150" show-overflow-tooltip />
-    <el-table-column prop="pluginVersion" label="插件版本号" min-width="150" show-overflow-tooltip />
-    <el-table-column label="操作" width="200" align="center" fixed="right">
+    <el-table-column prop="pluginVersion" label="插件版本号" min-width="100" show-overflow-tooltip />
+    <el-table-column label="操作" width="130" align="center" fixed="right">
       <template #default="{ row }">
         <el-button type="primary" link size="small" @click="$emit('switch-plugin', row)">切换插件</el-button>
         <el-button type="danger" link size="small" @click="$emit('delete', row)">删除</el-button>
