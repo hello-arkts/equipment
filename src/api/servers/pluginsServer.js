@@ -52,5 +52,14 @@ export default {
       responseType: 'blob',
       originalRes: true
     })
+  },
+  // 下载历史插件(单个)
+  pluginsDownloadArchive(id) {
+    return axiosApi({
+      url: `${apiConfig.deviceManagement}/downloads/archive/${ id }`,
+      method: 'get',
+      responseType: 'blob',
+      originalRes: true
+    })
   }
 }

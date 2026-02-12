@@ -47,6 +47,13 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  // 设置页面标题
+  if (to.meta.title) {
+    document.title = `${to.meta.title} - 插件管理系统`
+  } else {
+    document.title = '插件管理系统'
+  }
+
   const token = localStorage.getItem('token')
   if (to.path === '/login') {
     if (token) {
