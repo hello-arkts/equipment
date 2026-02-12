@@ -6,8 +6,11 @@ defineProps({
   }
 })
 defineEmits(['switch-plugin', 'delete', 'selection-change'])
-</script>
 
+const selectable = (row) => {
+  return !!row.jarName // 只有 jarName (插件包) 存在的行可以勾选
+}
+</script>
 <template>
   <el-table 
     :data="rows" 
@@ -16,13 +19,18 @@ defineEmits(['switch-plugin', 'delete', 'selection-change'])
     class="w-full h-full"
     @selection-change="$emit('selection-change', $event)"
   >
-    <el-table-column type="selection" width="55" align="center" />
+    <el-table-column type="selection" width="55" align="center" :selectable="selectable" />
     <el-table-column type="index" label="序号" width="60" align="center" />
     <el-table-column prop="ordName" label="厂家名称" min-width="150" show-overflow-tooltip />
     <el-table-column prop="deviceName" label="仪器名称" min-width="150" show-overflow-tooltip />
     <el-table-column prop="deviceModel" label="仪器型号" min-width="150" show-overflow-tooltip />
     <el-table-column prop="deviceCode" label="仪器编码" min-width="150" show-overflow-tooltip />
-    <el-table-column prop="jarName" label="默认插件包" min-width="150" show-overflow-tooltip />
+    <el-table-column prop="jarName" label="默认插件包" min-width="150" show-overflow-tooltip>
+      <template #default="{ row }">
+        <span v-if="row.jarName">{{ row.jarName }}</span>
+        <span v-else style="color: #f56c6c;">需要设置默认插件</span>
+      </template>
+    </el-table-column>
     <el-table-column prop="pluginVersion" label="插件版本号" min-width="100" show-overflow-tooltip />
     <el-table-column label="操作" width="130" align="center" fixed="right">
       <template #default="{ row }">
