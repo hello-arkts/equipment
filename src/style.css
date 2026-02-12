@@ -39,7 +39,6 @@ html, body {
 }
 
 /* 全局表格不换行，超出省略 */
-.el-table__cell,
 .el-table .cell {
   white-space: nowrap;
   overflow: hidden;
