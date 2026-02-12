@@ -45,3 +45,20 @@ html, body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.el-menu--popup {
+  --el-menu-text-color: #000;
+  --el-menu-hover-text-color: #000;
+  --el-menu-active-color: #000;
+}
+
+.el-menu--popup .el-menu-item,
+.el-menu--popup .el-sub-menu__title {
+  color: #000;
+}
+
+.el-menu--popup .el-menu-item i,
+.el-menu--popup .el-sub-menu__title i,
+.el-menu--popup .el-icon {
+  color: inherit;
+}
