@@ -13,9 +13,9 @@
       </div>
       <el-table :data="plugins" border stripe style="width: 100%; height: 100%; flex: 1" class="flex-1">
         <el-table-column prop="jarName" label="插件名称" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="version" label="版本号" width="120" show-overflow-tooltip />
         <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
-        <el-table-column label="操作" width="200" align="center" fixed="right">
+        <el-table-column prop="updateTime" label="更新时间" width="120" show-overflow-tooltip />
+        <el-table-column label="操作" width="150" align="center" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link size="small" @click="onDownload(row)">下载</el-button>
             <el-button type="primary" link size="small" @click="onEdit(row)">编辑</el-button>
@@ -33,12 +33,9 @@
       draggable
       append-to-body
     >
-      <el-form :model="form" label-width="80px">
-        <el-form-item label="版本号" required>
-          <el-input v-model="form.version" placeholder="请输入版本号" />
-        </el-form-item>
-        <el-form-item label="描述">
-          <el-input v-model="form.description" type="textarea" placeholder="请输入描述" />
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
+        <el-form-item label="描述" prop="description">
+          <el-input v-model="form.description" type="textarea" placeholder="请输入描述" :rows="5" />
         </el-form-item>
         <el-form-item label="插件文件" required>
           <el-upload
@@ -101,7 +98,6 @@ const fileList = ref([])
 const form = reactive({
   id: '',
   name: '',
-  version: '',
   description: '',
   file: null
 })
@@ -137,7 +133,6 @@ const onAddPlugin = () => {
   editMode.value = 'add'
   form.id = ''
   form.name = ''
-  form.version = ''
   form.description = ''
   form.file = null
   fileList.value = []
@@ -148,7 +143,6 @@ const onEdit = (row) => {
   editMode.value = 'edit'
   form.id = row.id
   form.name = row.name
-  form.version = row.version
   form.description = row.description
   form.file = null
   fileList.value = []
@@ -191,12 +185,6 @@ const onRemoveFile = () => {
 }
 
 const onSave = async () => {
-      // 校验版本号
-      if (!form.version) {
-        ElMessage.warning('请输入版本号')
-        return
-      }
-
       // 校验文件
       if (editMode.value === 'add' && !form.file) {
         ElMessage.warning('请上传插件文件 (.jar)')
@@ -205,7 +193,6 @@ const onSave = async () => {
 
   try {
     const params = new FormData()
-    params.append('version', form.version)
     params.append('description', form.description)
     params.append('deviceId', props.device.id)
     
