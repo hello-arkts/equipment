@@ -27,19 +27,6 @@ watch(() => props.info, (val) => {
   }
 }, { immediate: true, deep: true })
 
-const onSave = () => {
-  emit('save', form.value.expireTime)
-}
-
-const copyLicenseKey = async () => {
-  if (!form.value.licenseContent) return
-  try {
-    await navigator.clipboard.writeText(form.value.licenseContent)
-    ElMessage.success('授权码已复制')
-  } catch (err) {
-    ElMessage.error('复制失败')
-  }
-}
 </script>
 
 <template>
@@ -51,14 +38,9 @@ const copyLicenseKey = async () => {
         <span v-else class="text-gray-400">暂未设置</span>
       </el-descriptions-item>
       <el-descriptions-item label="激活码">
-        <el-tooltip content="双击复制" placement="top">
-          <span 
-            class="license-key" 
-            @dblclick="copyLicenseKey"
-          >
+        <span class="license-key">
             {{ form.licenseContent || '-' }}
-          </span>
-        </el-tooltip>
+        </span>
       </el-descriptions-item>
     </el-descriptions>
   </div>
@@ -72,13 +54,11 @@ const copyLicenseKey = async () => {
   overflow-y: auto;
 }
 .license-key {
-  cursor: pointer;
   font-family: monospace;
   background: #f4f4f5;
   padding: 2px 6px;
   border-radius: 4px;
   color: #606266;
-  user-select: none;
   display: inline-block;
   word-break: break-all;
   white-space: pre-wrap;
