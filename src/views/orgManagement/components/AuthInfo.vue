@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 
 const props = defineProps({
@@ -27,6 +27,19 @@ watch(() => props.info, (val) => {
   }
 }, { immediate: true, deep: true })
 
+const expireTagType = computed(() => {
+  if (!form.value.expireTime) return 'info'
+  
+  const expireDate = new Date(form.value.expireTime)
+  const now = new Date()
+  const diffTime = expireDate.getTime() - now.getTime()
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  
+  if (diffDays < 0) return 'danger' // 已超时，红色
+  if (diffDays < 30) return 'warning' // 少于10天，黄色
+  return 'success' // 正常，绿色
+})
+
 </script>
 
 <template>
@@ -34,7 +47,7 @@ watch(() => props.info, (val) => {
     <el-descriptions title="机构授权详情" :column="1" border label-width="200px">
       <el-descriptions-item label="机构名称">{{ form.orgName || '-' }}</el-descriptions-item>
       <el-descriptions-item label="当前有效期">
-        <el-tag v-if="form.expireTime" type="success">{{ form.expireTime ? form.expireTime.split(' ')[0] : '' }}</el-tag>
+        <el-tag v-if="form.expireTime" :type="expireTagType">{{ form.expireTime ? form.expireTime.split(' ')[0] : '' }}</el-tag>
         <span v-else class="text-gray-400">暂未设置</span>
       </el-descriptions-item>
       <el-descriptions-item label="激活码">
